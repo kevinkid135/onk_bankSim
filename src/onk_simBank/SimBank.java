@@ -57,49 +57,68 @@ public class SimBank {
 		input = in.nextLine();
 		switch (input) {
 		case "create":
-			create();
+			transactionCreate();
 		case "delete":
-			delete();
+			transactionDelete();
 		case "deposit":
-			deposit();
+			transactionDeposit();
 		case "logout":
-			logout();
+			transactionLogout();
 		case "transfer":
-			transfer();
+			transactionTransfer();
 		case "withdraw":
-			withdraw();
+			transactionWithdraw();
 		}
 
 	}
 
 	/**
-	 * Creates a temporary account object, and confirms that there's no conflict
-	 * before inserting the account object into the list
+	 * Reads in user input for an account number and checks if it exists in accList.
+	 * Attempts to create and insert a new Account into the accList if it does not exist.
+	 * Throws an InvalidInput exception if it already exists.
 	 */
-	private String create() {
+	private String transactionCreate() {
+		// get user input
+		
+		// check if it's valid (here or in account?)
+		
+		// check if it already exists (here or in account?)
+		
+		// throw InvalidInput exception if it doesn't exist
+		
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
 	/**
 	 * Creates a transaction summary line for deletion
 	 */
-	private String delete() {
+	private String transactionDelete() {
+		// create delete string
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private String deposit() {
+	/**
+	 * Deposits an amount into an account
+	 * 
+	 * @return
+	 */
+	private String transactionDeposit() {
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private String logout() {
+	/**
+	 * 
+	 * @return
+	 */
+	private String transactionLogout() {
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private String transfer() {
+	private String transactionTransfer() {
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private String withdraw() {
+	private String transactionWithdraw() {
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
