@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class SimBank {
-	int sessionType = 0; // 0 = not logged in; 1 = atm; 2 = agent
+	static int sessionType = 0; // 0 = not logged in; 1 = atm; 2 = agent
 	ArrayList<String> tranSummary;
 	ArrayList<Account> accList;
 	Scanner in = new Scanner(System.in); // new scanner object
@@ -122,7 +122,7 @@ public class SimBank {
 		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	public int getSessionType() {
+	public static int getSessionType() {
 		return sessionType;
 	}
 }
