@@ -9,6 +9,8 @@ public class SimBank {
 	int sessionType = 0; // 0 = not logged in; 1 = atm; 2 = agent
 	ArrayList<String> tranSummary;
 	ArrayList<Account> accList;
+	Scanner in = new Scanner(System.in); // new scanner object
+	String input;
 
 	public void start() {
 		// import account list into accList array
@@ -24,19 +26,17 @@ public class SimBank {
 	 */
 	private void login() {
 		do {
-			Scanner reader = new Scanner(System.in); // new scanner object
-			String input;
 			// login
 			out.println("Please login:");
-			input = reader.nextLine();
+			input = in.nextLine();
 			// check for valid input
-			if (input == "login") {
+			if (input.equals("login")) {
 				out.println("atm or agent?");
-				input = reader.nextLine();
-				if (input == "atm") {
+				input = in.nextLine();
+				if (input.equals("atm")) {
 					sessionType = 1;
 					out.println("Logged in as atm.");
-				} else if (input == "agent") {
+				} else if (input.equals("agent")) {
 					sessionType = 2;
 					out.println("Logged in as agent.");
 				} else {
@@ -54,19 +54,20 @@ public class SimBank {
 	 */
 	private void transaction() {
 		out.println("logout? Transaction?");
-		
+		input = in.nextLine();
 		switch (input) {
 		case "create":
-
+			create();
 		case "delete":
-
+			delete();
 		case "deposit":
-
+			deposit();
 		case "logout":
-
+			logout();
 		case "transfer":
-
+			transfer();
 		case "withdraw":
+			withdraw();
 		}
 
 	}
