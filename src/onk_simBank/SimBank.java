@@ -95,4 +95,8 @@ public class SimBank {
 	private void withdraw() {
 
 	}
+	
+	public int getSessionType(){
+		return sessionType;
+	}
 }
