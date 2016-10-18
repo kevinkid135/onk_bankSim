@@ -73,9 +73,13 @@ public class SimBank {
 	}
 
 	private void create() {
-
+		
 	}
 
+	// called when �delete� command is input
+	// checks if an account number is in the accList
+	// remove deleted account from accList
+	// creates and returns a TransactionMessage if the check was successful
 	private void delete() {
 
 	}
