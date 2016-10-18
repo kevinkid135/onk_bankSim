@@ -50,7 +50,7 @@ public class SimBank {
 	}
 
 	/**
-	 * Function that runs transaction methods
+	 * Method that runs method according to user input
 	 */
 	private void transaction() {
 		out.println("logout? Transaction?");
@@ -72,31 +72,38 @@ public class SimBank {
 
 	}
 
-	private void create() {
-
+	/**
+	 * Creates a temporary account object, and confirms that there's no conflict
+	 * before inserting the account object into the list
+	 */
+	private String create() {
+		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private void delete() {
-
+	/**
+	 * Creates a transaction summary line for deletion
+	 */
+	private String delete() {
+		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private void deposit() {
-
+	private String deposit() {
+		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private void logout() {
-
+	private String logout() {
+		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private void transfer() {
-
+	private String transfer() {
+		return "TT AAA BBB CCCC"; // TO-DO
 	}
 
-	private void withdraw() {
-
+	private String withdraw() {
+		return "TT AAA BBB CCCC"; // TO-DO
 	}
-	
-	public int getSessionType(){
+
+	public int getSessionType() {
 		return sessionType;
 	}
 }
