@@ -16,6 +16,12 @@ public class SimBank {
 	Scanner in = new Scanner(System.in); // new scanner object
 	String input; // used for user input
 
+	/**
+	 * Starts the session by importing the accounList file, into an array. Also
+	 * Initializes the tranSummary array to be placed into the Transaction
+	 * Summary file. Proceeds to ask user to login and handles the transactions
+	 * depending on what state the session is in.
+	 */
 	public void start() {
 		accList = new ArrayList<Account>();
 		tranSummary = new ArrayList<String>();
@@ -31,7 +37,8 @@ public class SimBank {
 	}
 
 	/**
-	 * login method
+	 * prompts user to login, and enter atm or agent. Also check whether or not
+	 * inputs are valid.
 	 */
 	private void login() {
 		do {
@@ -51,6 +58,8 @@ public class SimBank {
 						sessionType = 2;
 						out.println("Logged in as agent.");
 						break;
+					} else {
+						out.println("Invalid mode.");
 					}
 				}
 			}
@@ -90,6 +99,8 @@ public class SimBank {
 	 * accList. If account creation is successful, transaction message added to
 	 * transSummary. New account not added to accList to prevent transactions on
 	 * new account.
+	 * 
+	 * @return true to signify that the user is still logged in.
 	 */
 	private boolean transactionCreate() {
 		// Create allowed only in agent mode
@@ -124,6 +135,8 @@ public class SimBank {
 	 * accList. If account number is in accList, the account is removed from the
 	 * front-end list to prevent transactions. Transaction message for deletion
 	 * of the account is added to tranSummary.
+	 * 
+	 * @return true to signify the user is still logged in
 	 */
 	private boolean transactionDelete() {
 		// Delete allowed only in agent mode
@@ -145,8 +158,8 @@ public class SimBank {
 							it.remove();
 					}// close while-loop
 					System.out.println("Account " + acc + " deleted.");
-					String transMessage = "DL " + acc + "00000000 000 " + name;
-					tranSummary.add(transMessage);
+					tranSummary.add(toTransMsg("DL", Integer.parseInt(acc), 0,
+							0, name));
 				} else {
 					System.out.println("Account already exists");
 				}
@@ -160,7 +173,7 @@ public class SimBank {
 	/**
 	 * Deposits an amount into an account
 	 * 
-	 * @return
+	 * @return true to signify the user is still logged in
 	 */
 	private boolean transactionDeposit() {
 		System.out.println("Deposit");
@@ -174,20 +187,24 @@ public class SimBank {
 	}
 
 	private boolean transactionTransfer() {
-		System.out.println("Transfer");
-		// return "TT AAA BBB CCCC"; // TO-DO
-		return true;
-	}
-
-	private boolean transactionWithdraw() {
-		System.out.println("Withdraw");
-		// return "TT AAA BBB CCCC"; // TO-DO
+		System.out.println("Transfer"); // delete after finished with method
 		return true;
 	}
 
 	/**
+	 * Withdraw from account
 	 * 
-	 * @return
+	 * @return true to signifiy the user is still logged in
+	 */
+	private boolean transactionWithdraw() {
+		System.out.println("Withdraw"); // delete after finished with method
+		return true;
+	}
+
+	/**
+	 * Logs out of session
+	 * 
+	 * @return false to signify to loop, that user is logging out.
 	 */
 	private boolean transactionLogout() {
 		sessionType = 0;
@@ -195,6 +212,13 @@ public class SimBank {
 		return false;
 	}
 
+	/**
+	 * Check if an account already exists in accList
+	 * 
+	 * @param acc
+	 *            is the account number to be checked
+	 * @return true if it already exists, and false if it does not exist
+	 */
 	public boolean accountExist(String acc) {
 		int accNum = Integer.parseInt(acc);
 		for (Account a : accList) {
@@ -205,10 +229,11 @@ public class SimBank {
 	}
 
 	/**
-	 * Checks if account number is valid.
+	 * Checks if account number is valid syntactically.
 	 * 
 	 * @param acc
-	 * @return
+	 *            is the account number to be checked
+	 * @return true if the account is valid, and false if it is not
 	 */
 	public boolean validAccount(String acc) {
 		if (acc.matches("[0-9]+") && (acc.length() == 8)
@@ -219,10 +244,11 @@ public class SimBank {
 	}
 
 	/**
-	 * Checks if account name is valid.
+	 * Checks if account name is valid syntactically.
 	 * 
 	 * @param name
-	 * @return
+	 *            is the account number to be checked
+	 * @return true if the account is valid, and false if it is not
 	 */
 	public boolean validName(String name) {
 		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ")
@@ -294,6 +320,12 @@ public class SimBank {
 		return s;
 	}
 
+	/**
+	 * Signifies what state the current session is. 0 for not logged in, 1 for
+	 * atm, 2 for agent.
+	 * 
+	 * @return sessionType.
+	 */
 	public static int getSessionType() {
 		return sessionType;
 	}
