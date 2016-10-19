@@ -1,6 +1,7 @@
 package onk_simBank;
 
 // Add search method for account numbers?
+// Why are we returning a string? Can't we just add it to the arrayList and return void?
 // How can we prevent the creation of multiple accounts with the same account number?
 
 import static java.lang.System.out;
@@ -16,12 +17,15 @@ public class SimBank {
 	String input;
 
 	public void start() {
+		accList = new ArrayList<Account>();
+		tranSummary = new ArrayList<String>();
 		// import account list into accList array
-
+		Account one = new Account(12345678);
+		accList.add(one);
 		// run login script
 		login();
-
-		transaction();
+		while(true)
+			transaction();
 	}
 
 	/**
@@ -55,42 +59,33 @@ public class SimBank {
 	/**
 	 * Method that runs method according to user input
 	 */
-	private void transaction() {
+	private boolean transaction() {
 		// While loop used for repeated prompt after invalid command.
-		boolean command = false;
-		while(!command){
-			out.println("logout? Transaction?");
-			input = in.nextLine();
-			switch(input){
-			case "create":
-				transactionCreate();
-				command = true;
-				break;
-			case "delete":
-				transactionDelete();
-				command = true;
-				break;
-			case "deposit":
-				transactionDeposit();
-				command = true;
-				break;
-			case "logout":
-				transactionLogout();
-				command = true;
-				break;
-			case "transfer":
-				transactionTransfer();
-				command = true;
-				break;
-			case "withdraw":
-				transactionWithdraw();
-				command = true;
-				break;
-				// None of the options above inputed
-			default:
-				System.out.println("Invalid command");
-			}// Close switch statement
-		}//end while-loop
+		out.println("logout? Transaction?");
+		input = in.nextLine();
+		switch(input){
+		case "create":
+			return transactionCreate();
+		case "delete":
+			transactionDelete();
+			break;
+		case "deposit":
+			transactionDeposit();
+			break;
+		case "logout":
+			transactionLogout();
+			break;
+		case "transfer":
+			transactionTransfer();
+			break;
+		case "withdraw":
+			transactionWithdraw();
+			break;
+			// None of the options above inputed
+		default:
+			System.out.println("Invalid command");
+		}// Close switch statement
+		return false;
 	}// End transaction method
 
 	/**
@@ -98,29 +93,41 @@ public class SimBank {
 	 * Attempts to create and insert a new Account into the accList if it does not exist.
 	 * Throws an InvalidInput exception if it already exists.
 	 */
-	private String transactionCreate() {
+	private boolean transactionCreate(){
 		if(sessionType == 2){
 			// get user input
-			out.println("Account number?");
-			// check if it's valid (8 digits, does not start with 0) - throw InvalidInput if not valid
-
-			// check if it already exists - throw Invalid Input if it exists
-
-			// If valid and unique, create transaction message (Add to account list? How to prevent transaction?)
-
-			return "TT AAA BBB CCCC"; // TO-DO
-		}else{
+			System.out.println("Account number?");
+			String acc = in.nextLine();
+			// check if it's valid and unique
+			if(validAccount(acc)){
+				if(!accountExist(acc)){
+					System.out.println("Account name?");
+					String name = in.nextLine();
+					if(validName(name)){
+						System.out.println("Account " + acc + " created.");
+						String transMessage = "CR " + acc + "00000000 000 " + name;
+						tranSummary.add(transMessage);
+					}else
+						System.out.println("Invalid account name");
+				}
+				else{
+					System.out.println("Account already exists");
+				}	
+			} else
+				System.out.println("Invalid account number.");
+		} else
 			System.out.println("Invalid command.");
-			return null;
-		}
+		return true;
 	}
 
 	/**
 	 * Creates a transaction summary line for deletion
 	 */
-	private String transactionDelete() {
+	private boolean transactionDelete() {
+		System.out.println("Delete");
 		// create delete string
-		return "TT AAA BBB CCCC"; // TO-DO
+		//return "TT AAA BBB CCCC"; // TO-DO
+		return true;
 	}
 
 	/**
@@ -128,34 +135,73 @@ public class SimBank {
 	 * 
 	 * @return
 	 */
-	private String transactionDeposit() {
-		int accNum;
-		int amount;
-		out.println("Account number?");
-		input = in.nextLine();
+	private boolean transactionDeposit() {
+		System.out.println("Deposit");
 		// Check arrayList for matching account number - implement a search function?
 		// If match found, use Account to try deposit - success deposit return transaction message
 		// If match not found, print error and return to transaction()
-		return "TT AAA BBB CCCC"; // TO-DO
+		//return "TT AAA BBB CCCC"; // TO-DO
+		return true;
 	}
 
 	/**
 	 * 
 	 * @return
 	 */
-	private String transactionLogout() {
-		return "TT AAA BBB CCCC"; // TO-DO
+	private boolean transactionLogout() {
+		System.out.println("Logout");
+		//return "TT AAA BBB CCCC"; // TO-DO
+		return true;
 	}
 
-	private String transactionTransfer() {
-		return "TT AAA BBB CCCC"; // TO-DO
+	private boolean transactionTransfer() {
+		System.out.println("Transfer");
+		//return "TT AAA BBB CCCC"; // TO-DO
+		return true;
 	}
 
-	private String transactionWithdraw() {
-		return "TT AAA BBB CCCC"; // TO-DO
+	private boolean transactionWithdraw() {
+		System.out.println("Withdraw");
+		//return "TT AAA BBB CCCC"; // TO-DO
+		return true;
+	}
+
+	
+	public boolean accountExist(String acc){
+		int accNum = Integer.parseInt(acc);
+		for(Account a:accList){
+			if(accNum == a.getAccNum())
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if account number is valid.
+	 * @param acc
+	 * @return
+	 */
+	public boolean validAccount(String acc){
+		if(acc.matches("[0-9]+") && (acc.length() == 8) && !acc.startsWith("0"))
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Checks if account name is valid.
+	 * @param name
+	 * @return
+	 */
+	public boolean validName(String name){
+		if(name.length()>= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
+			return true;
+		else
+			return false;
 	}
 
 	public static int getSessionType() {
 		return sessionType;
 	}
+
 }
