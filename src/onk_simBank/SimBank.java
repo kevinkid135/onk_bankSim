@@ -1,12 +1,12 @@
 package onk_simBank;
 
-// Add search method for account numbers?
 // Why are we returning a string? Can't we just add it to the arrayList and return void?
 // How can we prevent the creation of multiple accounts with the same account number?
 
 import static java.lang.System.out;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class SimBank {
@@ -81,16 +81,18 @@ public class SimBank {
 			return transactionLogout(); // will return false
 		default:
 			System.out.println("Invalid command");
-			return true; // requests the user to enter a valid transaction
+			return true; // notifies that the user is still logged in
 		}// Close switch statement
 	}// End transaction method
 
 	/**
 	 * Reads in user input for an account number and checks if it exists in
-	 * accList. Attempts to create and insert a new Account into the accList if
-	 * it does not exist. Throws an InvalidInput exception if it already exists.
+	 * accList. If account creation is successful, transaction message added to
+	 * transSummary. New account not added to accList to prevent transactions on
+	 * new account.
 	 */
 	private boolean transactionCreate() {
+		// Create allowed only in agent mode
 		if (sessionType == 2) {
 			// get user input
 			System.out.println("Account number?");
@@ -100,9 +102,11 @@ public class SimBank {
 				if (!accountExist(acc)) {
 					System.out.println("Account name?");
 					String name = in.nextLine();
+					// check valid account name
 					if (validName(name)) {
 						System.out.println("Account " + acc + " created.");
-						tranSummary.add(toTransMsg("CR", Integer.parseInt(acc), 0, 0, name));
+						tranSummary.add(toTransMsg("CR", Integer.parseInt(acc),
+								0, 0, name));
 					} else
 						System.out.println("Invalid account name");
 				} else {
@@ -116,12 +120,40 @@ public class SimBank {
 	}
 
 	/**
-	 * Creates a transaction summary line for deletion
+	 * Reads in user input for an account number and checks if it exists in
+	 * accList. If account number is in accList, the account is removed from the
+	 * front-end list to prevent transactions. Transaction message for deletion
+	 * of the account is added to tranSummary.
 	 */
 	private boolean transactionDelete() {
-		System.out.println("Delete");
-		// create delete string
-		// return "TT AAA BBB CCCC"; // TO-DO
+		// Delete allowed only in agent mode
+		if (sessionType == 2) {
+			// get user input
+			System.out.println("Account number?");
+			String acc = in.nextLine();
+			// check if it's valid and in accList
+			if (validAccount(acc) && accountExist(acc)) {
+				System.out.println("Account name?");
+				String name = in.nextLine();
+				// check valid account name
+				if (validName(name)) {
+					Iterator<Account> it = accList.iterator();
+					// iterate through accList to find and remove account
+					while (it.hasNext()) {
+						Account a = it.next();
+						if (a.getAccNum() == Integer.parseInt(acc))
+							it.remove();
+					}// close while-loop
+					System.out.println("Account " + acc + " deleted.");
+					String transMessage = "DL " + acc + "00000000 000 " + name;
+					tranSummary.add(transMessage);
+				} else {
+					System.out.println("Account already exists");
+				}
+			} else
+				System.out.println("Invalid account number.");
+		} else
+			System.out.println("Invalid command.");
 		return true;
 	}
 
@@ -226,8 +258,9 @@ public class SimBank {
 			int amount, String name) {
 		// if transaction code is not 2 characters, throw exception
 		if (tranCode.length() != 2)
-			System.out.println("ERROR: Transaction code is not the correct length.");
-		
+			System.out
+					.println("ERROR: Transaction code is not the correct length.");
+
 		String accNum1String, accNum2String, amountString;
 		// convert accNum1 to a strong
 		if (accNum1 == 0)
@@ -254,7 +287,7 @@ public class SimBank {
 		// check if name parameter is not used
 		if (name == "")
 			name = "***";
-		
+
 		// creates string using parameters
 		String s = tranCode + " " + accNum1String + " " + accNum2String + " "
 				+ amountString + " " + name;
