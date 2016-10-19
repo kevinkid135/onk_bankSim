@@ -1,12 +1,12 @@
 package onk_simBank;
 
-// Add search method for account numbers?
 // Why are we returning a string? Can't we just add it to the arrayList and return void?
 // How can we prevent the creation of multiple accounts with the same account number?
 
 import static java.lang.System.out;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class SimBank {
@@ -90,10 +90,11 @@ public class SimBank {
 
 	/**
 	 * Reads in user input for an account number and checks if it exists in accList.
-	 * Attempts to create and insert a new Account into the accList if it does not exist.
-	 * Throws an InvalidInput exception if it already exists.
+	 * If account creation is successful, transaction message added to transSummary.
+	 * New account not added to accList to prevent transactions on new account.
 	 */
 	private boolean transactionCreate(){
+		//Create allowed only in agent mode
 		if(sessionType == 2){
 			// get user input
 			System.out.println("Account number?");
@@ -103,6 +104,7 @@ public class SimBank {
 				if(!accountExist(acc)){
 					System.out.println("Account name?");
 					String name = in.nextLine();
+					//check valid account name
 					if(validName(name)){
 						System.out.println("Account " + acc + " created.");
 						String transMessage = "CR " + acc + "00000000 000 " + name;
@@ -112,7 +114,7 @@ public class SimBank {
 				}
 				else{
 					System.out.println("Account already exists");
-				}	
+				}
 			} else
 				System.out.println("Invalid account number.");
 		} else
@@ -121,13 +123,43 @@ public class SimBank {
 	}
 
 	/**
-	 * Creates a transaction summary line for deletion
+	 * Reads in user input for an account number and checks if it exists in accList.
+	 * If account number is in accList, the account is removed from the front-end list to prevent transactions.
+	 * Transaction message for deletion of the account is added to tranSummary.
 	 */
 	private boolean transactionDelete() {
-		System.out.println("Delete");
+		//Delete allowed only in agent mode
+		if(sessionType == 2){
+			// get user input
+			System.out.println("Account number?");
+			String acc = in.nextLine();
+			// check if it's valid and in accList
+			if(validAccount(acc) && accountExist(acc)){
+				System.out.println("Account name?");
+				String name = in.nextLine();
+				//check valid account name
+				if(validName(name)){
+					Iterator<Account> it = accList.iterator();
+					// iterate through accList to find and remove account
+					while(it.hasNext()){
+						Account a = it.next();
+						if(a.getAccNum() == Integer.parseInt(acc))
+							it.remove();
+					}// close while-loop
+					System.out.println("Account " + acc + " deleted.");
+					String transMessage = "DL " + acc + "00000000 000 " + name;
+					tranSummary.add(transMessage);
+				}
+				else{
+					System.out.println("Account already exists");
+				}
+			} else
+				System.out.println("Invalid account number.");
+		} else
+			System.out.println("Invalid command.");
+		return true;
 		// create delete string
 		//return "TT AAA BBB CCCC"; // TO-DO
-		return true;
 	}
 
 	/**
@@ -166,7 +198,7 @@ public class SimBank {
 		return true;
 	}
 
-	
+
 	public boolean accountExist(String acc){
 		int accNum = Integer.parseInt(acc);
 		for(Account a:accList){
@@ -175,7 +207,7 @@ public class SimBank {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Checks if account number is valid.
 	 * @param acc
