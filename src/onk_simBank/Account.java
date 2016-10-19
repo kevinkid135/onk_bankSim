@@ -8,7 +8,7 @@ package onk_simBank;
 public class Account {
 	private int accNum;
 	private int withdrawTotal;
-	
+
 	/**
 	 * Constructor for account. Sets the withdrawnTotal and depositTotal to 0 when account object is created
 	 * @param acc
@@ -17,62 +17,59 @@ public class Account {
 		accNum = acc;
 		withdrawTotal = 0;
 	}// end Account constructor
-	
-	/*
-	public int getWithdrawTotal(){
-		return withdrawTotal;
-	}
-	
-	public int getDepositTotal(){
-		return depositTotal;
-	}
-	*/
-	
+
 	public int getAccNum(){
 		return accNum;
 	}
-	
-	
-	public void withdraw(int num) throws InvalidInput{
+
+
+	public boolean withdraw(int num) throws InvalidInput{
 		int sessionType = SimBank.getSessionType();
 		//check for valid withdraw amount
 		if(sessionType==1){
-		// atm limit of 1000 per transaction, 1000 per session
+			// atm limit of 1000 per transaction, 1000 per session
 			if(num > 1000)
 				throw new InvalidInput("Invalid amount.");
 			else if(num < 0)
 				throw new InvalidInput("Invalid amount.");
 			else if((withdrawTotal + num) > 1000)
 				throw new InvalidInput("Invalid amount.");
-			else
+			else{
 				withdrawTotal += num;
-		}else if(sessionType==2){
-		// agent limit of 99999999 per transaction, no limit per session
+				return true;
+			}
+		}else{
+			// agent limit of 99999999 per transaction, no limit per session
 			if(num > 99999999)
 				throw new InvalidInput("Invalid amount.");
 			else if(num < 0)
 				throw new InvalidInput("Invalid amount.");
-			else
+			else{
 				withdrawTotal += num;
+				return true;
+			}
 		}// end if-else for sessionTypes
 	}// end updateWithdrawTotal
-	
-	public void deposit(int acc, int num) throws InvalidInput{
+
+	public boolean deposit(int num) throws InvalidInput{
 		int sessionType = SimBank.getSessionType();
 		// check for valid deposit amount
 		if(sessionType==1){
-		// atm limit of 1000 per transaction, 1000 per session
-			if(num > 1000)
+			// atm limit of 1000 per transaction, 1000 per session
+			if(num > 1000){
 				throw new InvalidInput("Invalid amount.");
-			else if(num < 0)
+			}else if(num < 0)
 				throw new InvalidInput("Invalid amount.");
-		}else if(sessionType==2){
-		// agent limit of 99999999 per transaction, no limit per session
+				return true;
+		}else{
+			// agent limit of 99999999 per transaction, no limit per session
 			if(num > 99999999)
 				throw new InvalidInput("Invalid amount.");
 			else if(num < 0)
 				throw new InvalidInput("Invalid amount.");
+			return true;
 		}// end if-else for sessionTypes
-	}
+		
+	}// end deposit
 	
 }
