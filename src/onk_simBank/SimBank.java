@@ -11,10 +11,10 @@ import java.util.Scanner;
 
 public class SimBank {
 	static int sessionType = 0; // 0 = not logged in; 1 = atm; 2 = agent
-	ArrayList<String> tranSummary;
-	ArrayList<Account> accList;
+	static ArrayList<String> tranSummary;
+	static ArrayList<Account> accList;
 	Scanner in = new Scanner(System.in); // new scanner object
-	String input;
+	String input; // used for user input
 
 	public void start() {
 		accList = new ArrayList<Account>();
@@ -24,8 +24,10 @@ public class SimBank {
 		accList.add(one);
 		// run login script
 		login();
-		while(true)
-			transaction();
+		boolean loggedIn = true;
+		while (loggedIn) {
+			loggedIn = transaction();
+		}
 	}
 
 	/**
@@ -38,81 +40,74 @@ public class SimBank {
 			input = in.nextLine();
 			// check for valid input
 			if (input.equals("login")) {
-				out.println("atm or agent?");
-				input = in.nextLine();
-				if (input.equals("atm")) {
-					sessionType = 1;
-					out.println("Logged in as atm.");
-				} else if (input.equals("agent")) {
-					sessionType = 2;
-					out.println("Logged in as agent.");
-				} else {
-					// invalid input
+				while (true) { // exits loop once a valid input detected
+					out.println("atm or agent?");
+					input = in.nextLine();
+					if (input.equals("atm")) {
+						sessionType = 1;
+						out.println("Logged in as atm.");
+						break;
+					} else if (input.equals("agent")) {
+						sessionType = 2;
+						out.println("Logged in as agent.");
+						break;
+					}
 				}
-
-			} else {
-				// invalid input
 			}
 		} while (sessionType == 0);
 	}
 
 	/**
-	 * Method that runs method according to user input
+	 * Calls transaction functions, according to user input
+	 * 
+	 * @return false only when logging out
 	 */
 	private boolean transaction() {
 		// While loop used for repeated prompt after invalid command.
 		out.println("logout? Transaction?");
 		input = in.nextLine();
-		switch(input){
+		switch (input) {
 		case "create":
 			return transactionCreate();
 		case "delete":
-			transactionDelete();
-			break;
+			return transactionDelete();
 		case "deposit":
-			transactionDeposit();
-			break;
-		case "logout":
-			transactionLogout();
-			break;
+			return transactionDeposit();
 		case "transfer":
-			transactionTransfer();
-			break;
+			return transactionTransfer();
 		case "withdraw":
-			transactionWithdraw();
-			break;
-			// None of the options above inputed
+			return transactionWithdraw();
+		case "logout":
+			return transactionLogout(); // will return false
 		default:
 			System.out.println("Invalid command");
+			return true; // requests the user to enter a valid transaction
 		}// Close switch statement
-		return false;
 	}// End transaction method
 
 	/**
-	 * Reads in user input for an account number and checks if it exists in accList.
-	 * Attempts to create and insert a new Account into the accList if it does not exist.
-	 * Throws an InvalidInput exception if it already exists.
+	 * Reads in user input for an account number and checks if it exists in
+	 * accList. Attempts to create and insert a new Account into the accList if
+	 * it does not exist. Throws an InvalidInput exception if it already exists.
 	 */
-	private boolean transactionCreate(){
-		if(sessionType == 2){
+	private boolean transactionCreate() {
+		if (sessionType == 2) {
 			// get user input
 			System.out.println("Account number?");
 			String acc = in.nextLine();
 			// check if it's valid and unique
-			if(validAccount(acc)){
-				if(!accountExist(acc)){
+			if (validAccount(acc)) {
+				if (!accountExist(acc)) {
 					System.out.println("Account name?");
 					String name = in.nextLine();
-					if(validName(name)){
+					if (validName(name)) {
 						System.out.println("Account " + acc + " created.");
-						String transMessage = "CR " + acc + "00000000 000 " + name;
-						tranSummary.add(transMessage);
-					}else
+						tranSummary.add(toTransMsg("CR", Integer.parseInt(acc), 0, 0, name));
+					} else
 						System.out.println("Invalid account name");
-				}
-				else{
+				} else {
 					System.out.println("Account already exists");
-				}	
+				}
 			} else
 				System.out.println("Invalid account number.");
 		} else
@@ -126,7 +121,7 @@ public class SimBank {
 	private boolean transactionDelete() {
 		System.out.println("Delete");
 		// create delete string
-		//return "TT AAA BBB CCCC"; // TO-DO
+		// return "TT AAA BBB CCCC"; // TO-DO
 		return true;
 	}
 
@@ -137,10 +132,24 @@ public class SimBank {
 	 */
 	private boolean transactionDeposit() {
 		System.out.println("Deposit");
-		// Check arrayList for matching account number - implement a search function?
-		// If match found, use Account to try deposit - success deposit return transaction message
+		// Check arrayList for matching account number - implement a search
+		// function?
+		// If match found, use Account to try deposit - success deposit return
+		// transaction message
 		// If match not found, print error and return to transaction()
-		//return "TT AAA BBB CCCC"; // TO-DO
+		// return "TT AAA BBB CCCC"; // TO-DO
+		return true;
+	}
+
+	private boolean transactionTransfer() {
+		System.out.println("Transfer");
+		// return "TT AAA BBB CCCC"; // TO-DO
+		return true;
+	}
+
+	private boolean transactionWithdraw() {
+		System.out.println("Withdraw");
+		// return "TT AAA BBB CCCC"; // TO-DO
 		return true;
 	}
 
@@ -149,40 +158,29 @@ public class SimBank {
 	 * @return
 	 */
 	private boolean transactionLogout() {
-		System.out.println("Logout");
-		//return "TT AAA BBB CCCC"; // TO-DO
-		return true;
+		sessionType = 0;
+		System.out.println("End of session.");
+		return false;
 	}
 
-	private boolean transactionTransfer() {
-		System.out.println("Transfer");
-		//return "TT AAA BBB CCCC"; // TO-DO
-		return true;
-	}
-
-	private boolean transactionWithdraw() {
-		System.out.println("Withdraw");
-		//return "TT AAA BBB CCCC"; // TO-DO
-		return true;
-	}
-
-	
-	public boolean accountExist(String acc){
+	public boolean accountExist(String acc) {
 		int accNum = Integer.parseInt(acc);
-		for(Account a:accList){
-			if(accNum == a.getAccNum())
+		for (Account a : accList) {
+			if (accNum == a.getAccNum())
 				return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Checks if account number is valid.
+	 * 
 	 * @param acc
 	 * @return
 	 */
-	public boolean validAccount(String acc){
-		if(acc.matches("[0-9]+") && (acc.length() == 8) && !acc.startsWith("0"))
+	public boolean validAccount(String acc) {
+		if (acc.matches("[0-9]+") && (acc.length() == 8)
+				&& !acc.startsWith("0"))
 			return true;
 		else
 			return false;
@@ -190,14 +188,77 @@ public class SimBank {
 
 	/**
 	 * Checks if account name is valid.
+	 * 
 	 * @param name
 	 * @return
 	 */
-	public boolean validName(String name){
-		if(name.length()>= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
+	public boolean validName(String name) {
+		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ")
+				&& !name.endsWith(" "))
 			return true;
 		else
 			return false;
+	}
+
+	/**
+	 * Converts the transaction command into a string following the format of
+	 * the Transaction Summary File.
+	 * 
+	 * @param tranCode
+	 *            is a two letter transaction code, where DE-deposit,
+	 *            WD-withdrawal, TR-transfer, CR-create, DL-delete, ES-end of
+	 *            session
+	 * @param accNum1
+	 *            is the first (to) account number. Account numbers are always
+	 *            exactly eight decimal digits, not beginning with 0. If unused,
+	 *            enter 0
+	 * @param accNum2
+	 *            is the second (from) account number. Account numbers are
+	 *            always exactly eight decimal digits, not beginning with 0. If
+	 *            unused, enter 0
+	 * @param amount
+	 *            is the amount in cents. If unused, enter 0
+	 * @param name
+	 *            is the account name. If unused, enter empty string ""
+	 * @return a string following the format of the Transaction Summary File
+	 */
+	private static String toTransMsg(String tranCode, int accNum1, int accNum2,
+			int amount, String name) {
+		// if transaction code is not 2 characters, throw exception
+		if (tranCode.length() != 2)
+			System.out.println("ERROR: Transaction code is not the correct length.");
+		
+		String accNum1String, accNum2String, amountString;
+		// convert accNum1 to a strong
+		if (accNum1 == 0)
+			accNum1String = "00000000";
+		else
+			accNum1String = String.valueOf(accNum1);
+
+		// convert accNum2 to a string
+		if (accNum2 == 0)
+			accNum2String = "00000000";
+		else
+			accNum2String = String.valueOf(accNum2);
+
+		// convert amount to a string
+		if (amount == 0)
+			amountString = "000";
+		else if (amount < 10)
+			amountString = "00" + String.valueOf(amount);
+		else if (amount < 100)
+			amountString = "0" + String.valueOf(amount);
+		else
+			amountString = String.valueOf(amount);
+
+		// check if name parameter is not used
+		if (name == "")
+			name = "***";
+		
+		// creates string using parameters
+		String s = tranCode + " " + accNum1String + " " + accNum2String + " "
+				+ amountString + " " + name;
+		return s;
 	}
 
 	public static int getSessionType() {
