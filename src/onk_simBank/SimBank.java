@@ -50,8 +50,8 @@ public class SimBank {
 	String input; // used for user input
 
 	/**
-	 * Starts the session by asking the user to login until either 'login' or
-	 * 'exit' is entered.
+	 * Starts a new session by asking the user to login. 
+	 * Continuously prompts user to login until either 'login' or 'exit' is entered. 
 	 * 
 	 * If 'login', goes to login() and asks for transactions afterwards.
 	 * 
@@ -253,7 +253,7 @@ public class SimBank {
 	/**
 	 * Asks for a transaction, and calls the appropriate function.
 	 * 
-	 * Prints Invalid command if transaction command does not of the listed
+	 * Prints Invalid command if transaction command is not of the listed.
 	 * 
 	 * Returns a boolean indicating if user is to be still logged in (ie. false
 	 * if logout is requested).
