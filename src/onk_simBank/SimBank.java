@@ -318,6 +318,7 @@ public class SimBank {
 				try {
 
 					a.deposit(amount);
+
 					System.out.println(num + " deposited into account " + acc + ".");
 
 					// create and add transaction message to tranSummary array
@@ -414,15 +415,32 @@ public class SimBank {
 		System.out.println("Account number?");
 		String acc = in.nextLine();
 
-		// KEVIN TO DO
+		// check if it's valid and in accList
+		if (validAccount(acc) && accountExist(acc)) {
 
-		// validAccount()
-		if (validAccount(acc)) {
+			System.out.println("Amount?");
+			String num = in.nextLine();
 
-		}
-		// validAmount()
-		// do transaction
+			// check if syntax of amount is appropriate
+			if (validAmount(num)) {
+				int amount = Integer.parseInt(num);
 
+				// find account and check if withdraw is valid
+				Account a = findAccount(acc);
+				try {
+
+					a.withdraw(amount);
+					System.out.println(num + " withdrawn from account " + acc + ".");
+
+					// create and add transaction message to tranSummary array
+					tranSummary.add(toTransMsg("WD", "", acc, amount, ""));
+				} catch (InvalidInput e) {
+					System.out.println(e.getMessage());
+				}
+			} else
+				System.out.println("Invalid amount");
+		} else
+			System.out.println("Invalid account number.");
 		return true;
 	}
 
