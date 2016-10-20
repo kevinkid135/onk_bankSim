@@ -3,7 +3,6 @@ package onk_simBank;
 // don't have to type System before every output
 import static java.lang.System.out;
 
-// file input outputs, and arraylist
 import java.io.*;
 import java.util.*;
 
@@ -30,7 +29,7 @@ import java.util.*;
  *
  */
 public class SimBank {
-	
+
 	// declare constants indicating the current session type
 	static final int LOGGED_OUT = 0;
 	static final int ATM_MODE = 1;
@@ -204,7 +203,8 @@ public class SimBank {
 	 * @param name
 	 *            is the account name. If unused, input empty string ("")
 	 * 
-	 * @return a string following the format of a transaction message in the Transaction Summary File
+	 * @return a string following the format of a transaction message in the
+	 *         Transaction Summary File
 	 */
 	private static String toTransMsg(String tranCode, String accNum1, String accNum2, int amount, String name) {
 		String amountString = "";
@@ -252,7 +252,11 @@ public class SimBank {
 
 	/**
 	 * Asks for a transaction, and calls the appropriate function.
+	 * 
 	 * Prints Invalid command if transaction command does not of the listed
+	 * 
+	 * Returns a boolean indicating if user is to be still logged in (ie. false
+	 * if logout is requested).
 	 * 
 	 * @return false if logging out, true otherwise
 	 */
@@ -277,13 +281,15 @@ public class SimBank {
 			System.out.println("Invalid command");
 			return true; // notifies that the user is still logged in
 		}// Close switch statement
+
 	}// End transaction method
 
 	/**
-	 * Asks for the session type (atm or agent mode) until valid input is
-	 * entered. Proceeds to read in the valid accounts file in accList and
-	 * initializes the tranSummary array to be placed into the transaction
-	 * summary file.
+	 * Continually asks for the session type (atm or agent mode) until valid
+	 * input is entered.
+	 * 
+	 * Proceeds to read in the valid accounts file in accList and initializes
+	 * the tranSummary array to be placed into the transaction summary file.
 	 */
 	private void login() {
 
@@ -330,26 +336,39 @@ public class SimBank {
 	}
 
 	/**
-	 * Reads in user input for an account number and checks if it exists in
-	 * accList. If account creation is successful, transaction message added to
-	 * transSummary. New account not added to accList to prevent transactions on
-	 * new account.
+	 * Allowed only if the session type is set to agent mode.
+	 * 
+	 * Asks for an account number and checks if it is syntactically correct and
+	 * does not already exist in accList. If successful, asks for an account
+	 * name and checks if that is syntactically valid. If successful, the
+	 * transaction message is added to tranSummary array.
+	 * 
+	 * Note: The new account is not added to accList to prevent transactions on
+	 * this account in the current session.
 	 * 
 	 * @return true to signify that the user is still logged in.
 	 */
 	private boolean transactionCreate() {
-		// Create allowed only in agent mode
+
+		// create transaction is allowed only in agent mode
 		if (sessionType == AGENT_MODE) {
-			// get user input
+
+			// ask for account number
 			System.out.println("Account number?");
 			String acc = in.nextLine();
-			// check if it's valid and unique
+
+			// check if account number is valid and unique
 			if (validAccount(acc)) {
 				if (!accountExist(acc)) {
+
+					// ask for account name
 					System.out.println("Account name?");
 					String name = in.nextLine();
-					// check valid account name
+
+					// check if account name is valid
 					if (validName(name)) {
+
+						// print and add transaction message to tranSummary
 						System.out.println("Account " + acc + " created.");
 						tranSummary.add(toTransMsg("CR", acc, "", 0, name));
 					} else
@@ -365,32 +384,44 @@ public class SimBank {
 	}
 
 	/**
-	 * Reads in user input for an account number and checks if it exists in
-	 * accList. If account number is in accList, the account is removed from the
-	 * front-end list to prevent transactions. Transaction message for deletion
-	 * of the account is added to tranSummary.
+	 * Allowed only if the session type is set to agent mode.
+	 * 
+	 * Asks for an account number and checks if it is syntactically correct and
+	 * exists in accList. If successful, asks for the account name and checks
+	 * that it is syntactically valid. If successful, the account is removed
+	 * from the front-end list (accList) to prevent transactions, and adds the
+	 * transaction message to tranSummary array.
 	 * 
 	 * @return true to signify that the user is still logged in.
 	 */
 	private boolean transactionDelete() {
-		// Delete allowed only in agent mode
+		// delete transaction is allowed only in agent mode
 		if (sessionType == AGENT_MODE) {
-			// get user input
+
+			// ask for account number
 			System.out.println("Account number?");
 			String acc = in.nextLine();
-			// check if it's valid and in accList
+
+			// check if account number valid and exists in accList
 			if (validAccount(acc) && accountExist(acc)) {
+
+				// ask for account name
 				System.out.println("Account name?");
 				String name = in.nextLine();
-				// check valid account name
+
+				// check if account name is syntactically valid
 				if (validName(name)) {
+
 					Iterator<Account> it = accList.iterator();
+
 					// iterate through accList to find and remove account
 					while (it.hasNext()) {
 						Account a = it.next();
 						if (a.getAccNum() == Integer.parseInt(acc))
 							it.remove();
-					} // close while-loop
+					}
+
+					// print and add transaction message to tranSummary
 					System.out.println("Account " + acc + " deleted.");
 					tranSummary.add(toTransMsg("DL", acc, "", 0, name));
 				} else {
@@ -404,36 +435,40 @@ public class SimBank {
 	}
 
 	/**
-	 * Deposits an amount into an account
+	 * Asks for an account number and amount to deposit into an account. Adds
+	 * the transaction message to tranSummary array if both values are valid.
 	 * 
 	 * @return true to signify that the user is still logged in.
-	 * @throws InvalidInput
 	 */
 	private boolean transactionDeposit() {
 
+		// asks for an account number
 		System.out.println("Account number?");
 		String acc = in.nextLine();
 
-		// check if it's valid and in accList
+		// check if account number is valid and exists in accList
 		if (validAccount(acc) && accountExist(acc)) {
 
+			// asks for an amount
 			System.out.println("Amount?");
 			String num = in.nextLine();
 
-			// check if syntax of amount is appropriate
+			// check if syntax of amount is correct
 			if (validAmount(num)) {
 				int amount = Integer.parseInt(num);
 
-				// find account and check if deposit is valid
+				// find account
 				Account a = findAccount(acc);
 				try {
 
+					// check if deposit is valid
 					a.deposit(amount);
 
 					System.out.println(num + " deposited into account " + acc + ".");
 
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("DE", acc, "", amount, ""));
+
 				} catch (InvalidInput e) {
 					System.out.println(e.getMessage());
 				}
@@ -446,7 +481,9 @@ public class SimBank {
 	}
 
 	/**
-	 * Transfers an amount from one account to another
+	 * Asks for two account numbers and the amount to transfer between the
+	 * accounts. Adds the transaction message to tranSummary array if all values
+	 * are valid.
 	 * 
 	 * @return true to signify that the user is still logged in.
 	 */
@@ -498,8 +535,8 @@ public class SimBank {
 
 		try {
 
-			// withdraw amount from 'from' account
-			// and deposit the amount into the 'to' account
+			// check if withdraw amount from 'from' account is valid
+			// and check if deposit amount into the 'to' account is valid
 			acc1.withdraw(amountInt);
 			acc2.deposit(amountInt);
 
@@ -516,28 +553,34 @@ public class SimBank {
 	}
 
 	/**
-	 * Withdraw from account
+	 * Asks for an account number and amount to withdraw from an account. Adds
+	 * the transaction message to tranSummary array if both values are valid.
 	 * 
 	 * @return true to signify the user is still logged in
 	 */
 	private boolean transactionWithdraw() {
+
+		// ask for account number
 		System.out.println("Account number?");
 		String acc = in.nextLine();
 
-		// check if it's valid and in accList
+		// check if account number is valid and in accList
 		if (validAccount(acc) && accountExist(acc)) {
 
+			// ask for amount
 			System.out.println("Amount?");
 			String num = in.nextLine();
 
-			// check if syntax of amount is appropriate
+			// check if syntax of amount is correct
 			if (validAmount(num)) {
 				int amount = Integer.parseInt(num);
 
-				// find account and check if withdraw is valid
+				// find account
 				Account a = findAccount(acc);
 				try {
 
+					// check if withdraw is valid and add to session withdraw
+					// total
 					a.withdraw(amount);
 					System.out.println(num + " withdrawn from account " + acc + ".");
 
@@ -554,29 +597,36 @@ public class SimBank {
 	}
 
 	/**
-	 * log out of session and export tranSummary array to a new file. If file
-	 * doesn't exist, it will create it. If file already exists, it will
-	 * overwrite it.
+	 * Indicate logged out session type, and add end of session transaction to
+	 * tranSummary array. Return false to signify user is logging out.
+	 * 
+	 * Export all transaction summary file messages into a file with the name of
+	 * the value of TRANSACTION_SUMMARY_FILENAME. If file doesn't exist, it will
+	 * create it. If file already exists, it will overwrite it.
 	 * 
 	 * @return false to signify the user has logged out
 	 */
 	private boolean transactionLogout() {
+		
+		// indicate logged out session type
 		sessionType = LOGGED_OUT;
 
-		// add end of session to transSummary
+		// add end of session message to tranSummary
 		tranSummary.add(toTransMsg("ES", "", "", 0, ""));
 
-		// export tranSum array into textfile
-		// overwrites if file already exists
+		// export tranSummary array into file with the name of value of TRANSACTION_SUMMARY_FILENAME
+		// create new the file if it doesn't exist, overwrite it if the file already exists
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_SUMMARY_FILENAME));
+			
+			// iterate through tranSummary array and write each message to a new line
 			for (String str : tranSummary) {
 				writer.write(str);
 				writer.newLine();
 			}
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("error writing to file: " + TRANSACTION_SUMMARY_FILENAME);
+			System.out.println("Error writing to file: " + TRANSACTION_SUMMARY_FILENAME);
 			e.printStackTrace();
 			System.exit(1);
 		}
