@@ -1,18 +1,30 @@
 package onk_simBank;
 
-// Why are we returning a string? Can't we just add it to the arrayList and return void?
-// How can we prevent the creation of multiple accounts with the same account number?
-
+// don't have to type System before every output
 import static java.lang.System.out;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Scanner;
+// file input outputs, and arraylist
+import java.io.*;
+import java.util.*;
 
+/**
+ * Session Object
+ * 
+ * @author Team onk
+ *
+ */
 public class SimBank {
-	static int sessionType = 0; // 0 = not logged in; 1 = atm; 2 = agent
-	static ArrayList<String> tranSummary;
+	static final int LOGGED_OUT = 0;
+	static final int ATM_MODE = 1;
+	static final int AGENT_MODE = 2;
+	static int sessionType = LOGGED_OUT;
+
 	static ArrayList<Account> accList;
+	final String ACCOUNT_LIST_FILENAME = "accountList.txt";
+
+	static ArrayList<String> tranSummary;
+	final String TRANSACTION_SUMMARY_FILENAME = "tranSum.txt";
+
 	Scanner in = new Scanner(System.in); // new scanner object
 	String input; // used for user input
 
@@ -27,9 +39,22 @@ public class SimBank {
 	public void start() throws InvalidInput {
 		accList = new ArrayList<Account>();
 		tranSummary = new ArrayList<String>();
+
 		// import account list into accList array
-		Account one = new Account(12345678);
-		accList.add(one);
+		try (BufferedReader br = new BufferedReader(new FileReader(
+				ACCOUNT_LIST_FILENAME))) {
+			String currentLine;
+			while ((currentLine = br.readLine()) != null) {
+				Account tempAcc = new Account(Integer.parseInt(currentLine));
+				accList.add(tempAcc);
+			}
+
+		} catch (IOException e) {
+			System.out.println(ACCOUNT_LIST_FILENAME + " cannot be found");
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 		// run login script
 		login();
 		boolean loggedIn = true;
@@ -61,7 +86,8 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validAccount(String acc) {
-		if (acc.matches("[0-9]+") && (acc.length() == 8) && !acc.startsWith("0"))
+		if (acc.matches("[0-9]+") && (acc.length() == 8)
+				&& !acc.startsWith("0"))
 			return true;
 		else
 			return false;
@@ -89,7 +115,8 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validName(String name) {
-		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
+		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ")
+				&& !name.endsWith(" "))
 			return true;
 		else
 			return false;
@@ -102,7 +129,8 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validAmount(String amount) {
-		if (amount.matches("[0-9]+") && (amount.length() >= 3) && (amount.length() <= 8))
+		if (amount.matches("[0-9]+") && (amount.length() >= 3)
+				&& (amount.length() <= 8))
 			return true;
 		else
 			return false;
@@ -131,10 +159,14 @@ public class SimBank {
 	 * 
 	 * @return a string following the format of the Transaction Summary File
 	 */
-	private static String toTransMsg(String tranCode, String accNum1, String accNum2, int amount, String name) {
+	private static String toTransMsg(String tranCode, String accNum1,
+			String accNum2, int amount, String name) {
+		String amountString = "";
+
 		// if transaction code is not 2 characters, print error message
 		if (tranCode.length() != 2)
-			System.out.println("ERROR: Transaction code is not the correct length.");
+			System.out
+					.println("ERROR: Transaction code is not the correct length.");
 
 		// check if any accNum are not used
 		if (accNum1.isEmpty())
@@ -142,12 +174,24 @@ public class SimBank {
 		if (accNum2.isEmpty())
 			accNum2 = "00000000";
 
+		// pad the ammount
+		// convert amount to a string
+		if (amount == 0)
+			amountString = "000";
+		else if (amount < 10)
+			amountString = "00" + String.valueOf(amount);
+		else if (amount < 100)
+			amountString = "0" + String.valueOf(amount);
+		else
+			amountString = String.valueOf(amount);
+
 		// check if name parameter is not used
 		if (name.isEmpty())
 			name = "***";
 
 		// creates string using parameters
-		String s = tranCode + " " + accNum1 + " " + accNum2 + " " + amount + " " + name;
+		String s = tranCode + " " + accNum1 + " " + accNum2 + " "
+				+ amountString + " " + name;
 		return s;
 	}
 
@@ -205,17 +249,17 @@ public class SimBank {
 					out.println("atm or agent?");
 					input = in.nextLine();
 					if (input.equals("atm")) {
-						sessionType = 1;
+						sessionType = ATM_MODE;
 						out.println("Logged in as atm.");
 						break;
 					} else if (input.equals("agent")) {
-						sessionType = 2;
+						sessionType = AGENT_MODE;
 						out.println("Logged in as agent.");
 						break;
 					}
 				}
 			}
-		} while (sessionType == 0);
+		} while (sessionType == LOGGED_OUT);
 	}
 
 	/**
@@ -228,7 +272,7 @@ public class SimBank {
 	 */
 	private boolean transactionCreate() {
 		// Create allowed only in agent mode
-		if (sessionType == 2) {
+		if (sessionType == AGENT_MODE) {
 			// get user input
 			System.out.println("Account number?");
 			String acc = in.nextLine();
@@ -263,7 +307,7 @@ public class SimBank {
 	 */
 	private boolean transactionDelete() {
 		// Delete allowed only in agent mode
-		if (sessionType == 2) {
+		if (sessionType == AGENT_MODE) {
 			// get user input
 			System.out.println("Account number?");
 			String acc = in.nextLine();
@@ -319,7 +363,8 @@ public class SimBank {
 
 					a.deposit(amount);
 
-					System.out.println(num + " deposited into account " + acc + ".");
+					System.out.println(num + " deposited into account " + acc
+							+ ".");
 
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("DE", acc, "", amount, ""));
@@ -392,7 +437,8 @@ public class SimBank {
 			acc1.withdraw(amountInt);
 			acc2.deposit(amountInt);
 
-			System.out.println("Transferred " + amountInt + " " + accNum1 + " to " + accNum2);
+			System.out.println("Transferred " + amountInt + " " + accNum1
+					+ " to " + accNum2);
 
 			// create transaction message and add it to tranSummary array
 			tranSummary.add(toTransMsg("TR", accNum2, accNum1, amountInt, ""));
@@ -410,8 +456,6 @@ public class SimBank {
 	 * @return true to signify the user is still logged in
 	 */
 	private boolean transactionWithdraw() {
-		System.out.println("Withdraw"); // delete once finished
-
 		System.out.println("Account number?");
 		String acc = in.nextLine();
 
@@ -430,7 +474,8 @@ public class SimBank {
 				try {
 
 					a.withdraw(amount);
-					System.out.println(num + " withdrawn from account " + acc + ".");
+					System.out.println(num + " withdrawn from account " + acc
+							+ ".");
 
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("WD", "", acc, amount, ""));
@@ -445,12 +490,35 @@ public class SimBank {
 	}
 
 	/**
-	 * log out of session
+	 * log out of session and export tranSummary array to a new file. If file
+	 * doesn't exist, it will create it. If file already exists, it will
+	 * overwrite it.
 	 * 
 	 * @return false to signify the user has logged out
 	 */
 	private boolean transactionLogout() {
-		sessionType = 0;
+		sessionType = LOGGED_OUT;
+
+		// add end of session to transSummary
+		tranSummary.add(toTransMsg("ES", "", "", 0, ""));
+
+		// export tranSum array into textfile
+		// overwrites if file already exists
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(
+					TRANSACTION_SUMMARY_FILENAME));
+			for (String str : tranSummary) {
+				writer.write(str);
+				writer.newLine();
+			}
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("error writing to file: "
+					+ TRANSACTION_SUMMARY_FILENAME);
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 		System.out.println("End of session.");
 		return false;
 	}
