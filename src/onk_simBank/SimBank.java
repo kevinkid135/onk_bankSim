@@ -117,8 +117,7 @@ public class SimBank {
 					// check valid account name
 					if (validName(name)) {
 						System.out.println("Account " + acc + " created.");
-						tranSummary.add(toTransMsg("CR", Integer.parseInt(acc),
-								0, 0, name));
+						tranSummary.add(toTransMsg("CR", acc, "", 0, name));
 					} else
 						System.out.println("Invalid account name");
 				} else {
@@ -159,8 +158,7 @@ public class SimBank {
 							it.remove();
 					}// close while-loop
 					System.out.println("Account " + acc + " deleted.");
-					String transMessage = "DL " + acc + "00000000 000 " + name;
-					tranSummary.add(transMessage);
+					tranSummary.add(toTransMsg("DL", acc, "", 0, name));
 				} else {
 					System.out.println("Account already exists");
 				}
@@ -181,7 +179,7 @@ public class SimBank {
 		System.out.println("Account number?");
 		String acc = in.nextLine();
 		// check if it's valid and in accList
-		if (validAccount(acc) && accountExist(acc)) {
+		if (validAccount(acc)) {
 			System.out.println("Amount?");
 			String num = in.nextLine();
 			// check if syntax of amount is appropriate
@@ -193,9 +191,7 @@ public class SimBank {
 					a.deposit(amount);
 					System.out.println(num + " deposited into account " + acc
 							+ ".");
-					String transMessage = "DE " + acc + " " + amount
-							+ " 000 ***";
-					tranSummary.add(transMessage);
+					tranSummary.add(toTransMsg("DE", acc, "", amount, ""));
 				} catch (InvalidInput e) {
 					System.out.println(e.getMessage());
 				}
@@ -229,8 +225,20 @@ public class SimBank {
 	 * @return true to signify the user is still logged in
 	 */
 	private boolean transactionWithdraw() {
-		System.out.println("Withdraw");
-		// return "TT AAA BBB CCCC"; // TO-DO
+		System.out.println("Withdraw"); // delete once finished
+
+		System.out.println("Account number?");
+		String acc = in.nextLine();
+
+		// KEVIN TO DO
+
+		// validAccount()
+		if (validAccount(acc)) {
+
+		}
+		// validAmount()
+		// do transaction
+
 		return true;
 	}
 
@@ -329,54 +337,38 @@ public class SimBank {
 	 * @param accNum1
 	 *            is the first (to) account number. Account numbers are always
 	 *            exactly eight decimal digits, not beginning with 0. If unused,
-	 *            enter 0
+	 *            input empty string ("")
 	 * @param accNum2
 	 *            is the second (from) account number. Account numbers are
 	 *            always exactly eight decimal digits, not beginning with 0. If
-	 *            unused, enter 0
+	 *            unused, input empty string ("")
 	 * @param amount
 	 *            is the amount in cents. If unused, enter 0
 	 * @param name
-	 *            is the account name. If unused, enter empty string ""
+	 *            is the account name. If unused, input empty string ("")
+	 * 
 	 * @return a string following the format of the Transaction Summary File
 	 */
-	private static String toTransMsg(String tranCode, int accNum1, int accNum2,
-			int amount, String name) {
-		// if transaction code is not 2 characters, throw exception
+	private static String toTransMsg(String tranCode, String accNum1,
+			String accNum2, int amount, String name) {
+		// if transaction code is not 2 characters, print error message
 		if (tranCode.length() != 2)
 			System.out
 					.println("ERROR: Transaction code is not the correct length.");
 
-		String accNum1String, accNum2String, amountString;
-		// convert accNum1 to a strong
-		if (accNum1 == 0)
-			accNum1String = "00000000";
-		else
-			accNum1String = String.valueOf(accNum1);
-
-		// convert accNum2 to a string
-		if (accNum2 == 0)
-			accNum2String = "00000000";
-		else
-			accNum2String = String.valueOf(accNum2);
-
-		// convert amount to a string
-		if (amount == 0)
-			amountString = "000";
-		else if (amount < 10)
-			amountString = "00" + String.valueOf(amount);
-		else if (amount < 100)
-			amountString = "0" + String.valueOf(amount);
-		else
-			amountString = String.valueOf(amount);
+		// check if any accNum are not used
+		if (accNum1.isEmpty())
+			accNum1 = "00000000";
+		if (accNum2.isEmpty())
+			accNum2 = "00000000";
 
 		// check if name parameter is not used
-		if (name == "")
+		if (name.isEmpty())
 			name = "***";
 
 		// creates string using parameters
-		String s = tranCode + " " + accNum1String + " " + accNum2String + " "
-				+ amountString + " " + name;
+		String s = tranCode + " " + accNum1 + " " + accNum2 + " " + amount
+				+ " " + name;
 		return s;
 	}
 
