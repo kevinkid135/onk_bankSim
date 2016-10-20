@@ -37,214 +37,7 @@ public class SimBank {
 			loggedIn = transaction();
 		}
 	}
-
-	/**
-	 * prompts user to login, and enter atm or agent. Also check whether or not
-	 * inputs are valid.
-	 */
-	private void login() {
-		do {
-			// login
-			out.println("Please login:");
-			input = in.nextLine();
-			// check for valid input
-			if (input.equals("login")) {
-				while (true) { // exits loop once a valid input detected
-					out.println("atm or agent?");
-					input = in.nextLine();
-					if (input.equals("atm")) {
-						sessionType = 1;
-						out.println("Logged in as atm.");
-						break;
-					} else if (input.equals("agent")) {
-						sessionType = 2;
-						out.println("Logged in as agent.");
-						break;
-					}
-				}
-			}
-		} while (sessionType == 0);
-	}
-
-	/**
-	 * Calls transaction functions, according to user input
-	 * 
-	 * @return false only when logging out
-	 * @throws InvalidInput
-	 */
-	private boolean transaction() throws InvalidInput {
-		// While loop used for repeated prompt after invalid command.
-		out.println("logout? Transaction?");
-		input = in.nextLine();
-		switch (input) {
-		case "create":
-			return transactionCreate();
-		case "delete":
-			return transactionDelete();
-		case "deposit":
-			return transactionDeposit();
-		case "transfer":
-			return transactionTransfer();
-		case "withdraw":
-			return transactionWithdraw();
-		case "logout":
-			return transactionLogout(); // will return false
-		default:
-			System.out.println("Invalid command");
-			return true; // notifies that the user is still logged in
-		}// Close switch statement
-	}// End transaction method
-
-	/**
-	 * Reads in user input for an account number and checks if it exists in
-	 * accList. If account creation is successful, transaction message added to
-	 * transSummary. New account not added to accList to prevent transactions on
-	 * new account.
-	 * 
-	 * @return true to signify that the user is still logged in.
-	 */
-	private boolean transactionCreate() {
-		// Create allowed only in agent mode
-		if (sessionType == 2) {
-			// get user input
-			System.out.println("Account number?");
-			String acc = in.nextLine();
-			// check if it's valid and unique
-			if (validAccount(acc)) {
-				if (!accountExist(acc)) {
-					System.out.println("Account name?");
-					String name = in.nextLine();
-					// check valid account name
-					if (validName(name)) {
-						System.out.println("Account " + acc + " created.");
-						tranSummary.add(toTransMsg("CR", Integer.parseInt(acc),
-								0, 0, name));
-					} else
-						System.out.println("Invalid account name");
-				} else {
-					System.out.println("Account already exists");
-				}
-			} else
-				System.out.println("Invalid account number.");
-		} else
-			System.out.println("Invalid command.");
-		return true;
-	}
-
-	/**
-	 * Reads in user input for an account number and checks if it exists in
-	 * accList. If account number is in accList, the account is removed from the
-	 * front-end list to prevent transactions. Transaction message for deletion
-	 * of the account is added to tranSummary.
-	 * 
-	 * @return true to signify that the user is still logged in.
-	 */
-	private boolean transactionDelete() {
-		// Delete allowed only in agent mode
-		if (sessionType == 2) {
-			// get user input
-			System.out.println("Account number?");
-			String acc = in.nextLine();
-			// check if it's valid and in accList
-			if (validAccount(acc) && accountExist(acc)) {
-				System.out.println("Account name?");
-				String name = in.nextLine();
-				// check valid account name
-				if (validName(name)) {
-					Iterator<Account> it = accList.iterator();
-					// iterate through accList to find and remove account
-					while (it.hasNext()) {
-						Account a = it.next();
-						if (a.getAccNum() == Integer.parseInt(acc))
-							it.remove();
-					}// close while-loop
-					System.out.println("Account " + acc + " deleted.");
-					String transMessage = "DL " + acc + "00000000 000 " + name;
-					tranSummary.add(transMessage);
-				} else {
-					System.out.println("Account already exists");
-				}
-			} else
-				System.out.println("Invalid account number.");
-		} else
-			System.out.println("Invalid command.");
-		return true;
-	}
-
-	/**
-	 * Deposits an amount into an account
-	 * 
-	 * @return true to signify that the user is still logged in.
-	 * @throws InvalidInput
-	 */
-	private boolean transactionDeposit() throws InvalidInput {
-		System.out.println("Account number?");
-		String acc = in.nextLine();
-		// check if it's valid and in accList
-		if (validAccount(acc) && accountExist(acc)) {
-			System.out.println("Amount?");
-			String num = in.nextLine();
-			// check if syntax of amount is appropriate
-			if (validAmount(num)) {
-				int amount = Integer.parseInt(num);
-				// find account and check if deposit is valid
-				Account a = findAccount(acc);
-				try {
-					a.deposit(amount);
-					System.out.println(num + " deposited into account " + acc
-							+ ".");
-					String transMessage = "DE " + acc + " " + amount
-							+ " 000 ***";
-					tranSummary.add(transMessage);
-				} catch (InvalidInput e) {
-					System.out.println(e.getMessage());
-				}
-			} else
-				System.out.println("Invalid amount.");
-		} else
-			System.out.println("Invalid account number.");
-		// Check arrayList for matching account number - implement a search
-		// function?
-		// If match found, use Account to try deposit - success deposit return
-		// transaction message
-		// If match not found, print error and return to transaction()
-		// return "TT AAA BBB CCCC"; // TO-DO
-		return true;
-	}
-
-	/**
-	 * Deposits an amount into an account
-	 * 
-	 * @return true to signify that the user is still logged in.
-	 */
-	private boolean transactionTransfer() {
-		System.out.println("Transfer");
-		// return "TT AAA BBB CCCC"; // TO-DO
-		return true;
-	}
-
-	/**
-	 * Withdraw from account
-	 * 
-	 * @return true to signify the user is still logged in
-	 */
-	private boolean transactionWithdraw() {
-		System.out.println("Withdraw");
-		// return "TT AAA BBB CCCC"; // TO-DO
-		return true;
-	}
-
-	/**
-	 * log out of session
-	 * 
-	 * @return false to signify the user has logged out
-	 */
-	private boolean transactionLogout() {
-		sessionType = 0;
-		System.out.println("End of session.");
-		return false;
-	}
-
+	
 	/**
 	 * Check if an account already exists in accList
 	 * 
@@ -390,4 +183,267 @@ public class SimBank {
 		return sessionType;
 	}
 
+	/**
+	 * Calls transaction functions, according to user input
+	 * 
+	 * @return false only when logging out
+	 * @throws InvalidInput
+	 */
+	private boolean transaction() throws InvalidInput {
+		// While loop used for repeated prompt after invalid command.
+		out.println("logout? Transaction?");
+		input = in.nextLine();
+		switch (input) {
+		case "create":
+			return transactionCreate();
+		case "delete":
+			return transactionDelete();
+		case "deposit":
+			return transactionDeposit();
+		case "transfer":
+			return transactionTransfer();
+		case "withdraw":
+			return transactionWithdraw();
+		case "logout":
+			return transactionLogout(); // will return false
+		default:
+			System.out.println("Invalid command");
+			return true; // notifies that the user is still logged in
+		}// Close switch statement
+	}// End transaction method
+
+	/**
+	 * prompts user to login, and enter atm or agent. Also check whether or not
+	 * inputs are valid.
+	 */
+	private void login() {
+		do {
+			// login
+			out.println("Please login:");
+			input = in.nextLine();
+			// check for valid input
+			if (input.equals("login")) {
+				while (true) { // exits loop once a valid input detected
+					out.println("atm or agent?");
+					input = in.nextLine();
+					if (input.equals("atm")) {
+						sessionType = 1;
+						out.println("Logged in as atm.");
+						break;
+					} else if (input.equals("agent")) {
+						sessionType = 2;
+						out.println("Logged in as agent.");
+						break;
+					}
+				}
+			}
+		} while (sessionType == 0);
+	}
+
+	/**
+	 * Reads in user input for an account number and checks if it exists in
+	 * accList. If account creation is successful, transaction message added to
+	 * transSummary. New account not added to accList to prevent transactions on
+	 * new account.
+	 * 
+	 * @return true to signify that the user is still logged in.
+	 */
+	private boolean transactionCreate() {
+		// Create allowed only in agent mode
+		if (sessionType == 2) {
+			// get user input
+			System.out.println("Account number?");
+			String acc = in.nextLine();
+			// check if it's valid and unique
+			if (validAccount(acc)) {
+				if (!accountExist(acc)) {
+					System.out.println("Account name?");
+					String name = in.nextLine();
+					// check valid account name
+					if (validName(name)) {
+						System.out.println("Account " + acc + " created.");
+						tranSummary.add(toTransMsg("CR", Integer.parseInt(acc),
+								0, 0, name));
+					} else
+						System.out.println("Invalid account name");
+				} else {
+					System.out.println("Account already exists");
+				}
+			} else
+				System.out.println("Invalid account number.");
+		} else
+			System.out.println("Invalid command.");
+		return true;
+	}
+
+	/**
+	 * Reads in user input for an account number and checks if it exists in
+	 * accList. If account number is in accList, the account is removed from the
+	 * front-end list to prevent transactions. Transaction message for deletion
+	 * of the account is added to tranSummary.
+	 * 
+	 * @return true to signify that the user is still logged in.
+	 */
+	private boolean transactionDelete() {
+		// Delete allowed only in agent mode
+		if (sessionType == 2) {
+			// get user input
+			System.out.println("Account number?");
+			String acc = in.nextLine();
+			// check if it's valid and in accList
+			if (validAccount(acc) && accountExist(acc)) {
+				System.out.println("Account name?");
+				String name = in.nextLine();
+				// check valid account name
+				if (validName(name)) {
+					Iterator<Account> it = accList.iterator();
+					// iterate through accList to find and remove account
+					while (it.hasNext()) {
+						Account a = it.next();
+						if (a.getAccNum() == Integer.parseInt(acc))
+							it.remove();
+					}// close while-loop
+					System.out.println("Account " + acc + " deleted.");
+					String transMessage = "DL " + acc + "00000000 000 " + name;
+					tranSummary.add(transMessage);
+				} else {
+					System.out.println("Account already exists");
+				}
+			} else
+				System.out.println("Invalid account number.");
+		} else
+			System.out.println("Invalid command.");
+		return true;
+	}
+
+	/**
+	 * Deposits an amount into an account
+	 * 
+	 * @return true to signify that the user is still logged in.
+	 * @throws InvalidInput
+	 */
+	private boolean transactionDeposit() throws InvalidInput {
+		
+		System.out.println("Account number?");
+		String acc = in.nextLine();
+		
+		// check if it's valid and in accList
+		if (validAccount(acc) && accountExist(acc)) {
+			
+			System.out.println("Amount?");
+			String num = in.nextLine();
+			
+			// check if syntax of amount is appropriate
+			if (validAmount(num)) {
+				int amount = Integer.parseInt(num);
+				
+				// find account and check if deposit is valid
+				Account a = findAccount(acc);
+				try {
+					
+					a.deposit(amount);
+					System.out.println(num + " deposited into account " + acc
+							+ ".");
+					String transMessage = "DE " + acc + " " + amount
+							+ " 000 ***";
+					tranSummary.add(transMessage);
+					
+				} catch (InvalidInput e) {
+					System.out.println(e.getMessage());
+				}
+			} else
+				System.out.println("Invalid amount.");
+		} else
+			System.out.println("Invalid account number.");
+
+		return true;
+	}
+
+	/**
+	 * Transfers an amount from one account to another
+	 * 
+	 * @return true to signify that the user is still logged in.
+	 */
+	private boolean transactionTransfer() {
+		
+		// ask user for account number to transfer FROM
+		System.out.println("Account number?");
+		String accNum1 = in.nextLine();
+		
+		// return if 'from' account number is NOT valid or does NOT exist
+		// continue if valid and exists
+		if (!validAccount(accNum1) || !accountExist(accNum1)) {
+			System.out.println("Invalid account number.");
+			return true;
+		}
+		
+		
+		// ask user for account number to transfer TO
+		System.out.println("Account number?");
+		String accNum2 = in.nextLine();
+		
+		// return if 'to' account number is NOT valid or does NOT exist;
+		// continue if valid and exists
+		if (!validAccount(accNum2) || !accountExist(accNum2)) {
+			System.out.println("Invalid account number.");
+			return true;
+		}
+		
+		
+		// ask user for AMOUNT to transfer
+		System.out.println("Amount?");
+		String amountStr = in.nextLine();
+		
+		// return if amount is NOT valid; continue if valid
+		if (!validAmount(amountStr)) {
+			System.out.println("Invalid amount.");
+			return true;
+		}
+		
+		int amountInt = Integer.parseInt(amountStr);
+		
+		// find account in accList array and create Account object
+		Account acc1 = findAccount(accNum1);
+		Account acc2 = findAccount(accNum1);
+		
+		try {
+			
+			// withdraw amount from 'from' account
+			// and deposit the amount into the 'to' account
+			acc1.withdraw(amountInt);
+			acc2.deposit(amountInt);
+			
+			System.out.println("Transferred " + amountInt + " " + accNum1 + " to " + accNum2);
+			//String transMessage = toTransMsg(); // UNFINISHED; need to get the updates
+			
+		} catch (InvalidInput e) {
+			System.out.println(e.getMessage());
+		}
+		
+		
+	
+		return true;
+	}
+
+	/**
+	 * Withdraw from account
+	 * 
+	 * @return true to signify the user is still logged in
+	 */
+	private boolean transactionWithdraw() {
+		System.out.println("Withdraw");
+		// return "TT AAA BBB CCCC"; // TO-DO
+		return true;
+	}
+
+	/**
+	 * log out of session
+	 * 
+	 * @return false to signify the user has logged out
+	 */
+	private boolean transactionLogout() {
+		sessionType = 0;
+		System.out.println("End of session.");
+		return false;
+	}
 }
