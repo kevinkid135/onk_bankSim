@@ -61,7 +61,7 @@ public class Onk {
 	}// end main
 
 	/**
-	 * Getter: Returns the filename for the accounts list file.
+	 * Returns the filename for the accounts list file as a String.
 	 * 
 	 * @return filename for the accounts list file
 	 */
@@ -70,7 +70,7 @@ public class Onk {
 	}
 
 	/**
-	 * Getter: Returns the filename for the transaction summary file.
+	 * Returns the filename for the transaction summary file as a String.
 	 * 
 	 * @return filename for the transaction summary file
 	 */
