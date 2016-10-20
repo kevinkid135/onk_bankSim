@@ -1,7 +1,8 @@
 package onk_simBank;
 
 /**
- * A class to keep track of the total withdrawn amounts for each account.
+ * Account class. Keeps track of the total withdrawn amounts for each account
+ * and to check if withdraw/deposit amounts are valid.
  * 
  * @author Team Onk
  *
@@ -47,8 +48,10 @@ public class Account {
 	 */
 	public boolean withdraw(int num) throws InvalidInput {
 		int sessionType = SimBank.getSessionType();
+
 		// check for valid withdraw amount
 		if (sessionType == SimBank.ATM_MODE) {
+
 			// atm limit of 1000 per transaction, 1000 per session
 			if (num > 1000)
 				throw new InvalidInput("Invalid amount.");
@@ -60,7 +63,8 @@ public class Account {
 				withdrawTotal += num;
 				return true;
 			}
-		} else {
+		} else if (sessionType == SimBank.AGENT_MODE) {
+
 			// agent limit of 99999999 per transaction, no limit per session
 			if (num > 99999999)
 				throw new InvalidInput("Invalid amount.");
@@ -70,7 +74,10 @@ public class Account {
 				withdrawTotal += num;
 				return true;
 			}
-		} // end if-else for sessionTypes
+		} else { // should not be in this method if none if none of the other session
+					// types
+			return true;
+		}
 	}// end updateWithdrawTotal
 
 	/**
@@ -84,26 +91,35 @@ public class Account {
 	 * @return true if the withdrawn amount is within the constraints, and false
 	 *         otherwise.
 	 * @throws InvalidInput
-	 *            if the withdrawn amount is not within the constraints.
+	 *             if the withdrawn amount is not within the constraints.
 	 */
 	public boolean deposit(int num) throws InvalidInput {
 		int sessionType = SimBank.getSessionType();
+
 		// check for valid deposit amount
 		if (sessionType == 1) {
+
 			// atm limit of 1000 per transaction, 1000 per session
 			if (num > 1000) {
 				throw new InvalidInput("Invalid amount.");
 			} else if (num < 0)
 				throw new InvalidInput("Invalid amount.");
+			
 			return true;
-		} else {
+			
+		} else if (sessionType == SimBank.AGENT_MODE) {
+
 			// agent limit of 99999999 per transaction, no limit per session
 			if (num > 99999999)
 				throw new InvalidInput("Invalid amount.");
 			else if (num < 0)
 				throw new InvalidInput("Invalid amount.");
+			
 			return true;
-		} // end if-else for sessionTypes
+		} else { // should not be in this method if none if none of the other session
+					// types
+			return true;
+		}
 
 	}// end deposit
 
