@@ -40,9 +40,9 @@ public class SimBank {
 		accList = new ArrayList<Account>();
 		tranSummary = new ArrayList<String>();
 
-		// import account list into accList array
-		try (BufferedReader br = new BufferedReader(new FileReader(
-				ACCOUNT_LIST_FILENAME))) {
+		// read in file and import account list into accList array
+		try (BufferedReader br = new BufferedReader(new FileReader(ACCOUNT_LIST_FILENAME))) {
+
 			String currentLine;
 			while ((currentLine = br.readLine()) != null) {
 				Account tempAcc = new Account(Integer.parseInt(currentLine));
@@ -55,8 +55,29 @@ public class SimBank {
 			System.exit(1);
 		}
 
-		// run login script
-		login();
+		// keep asking for login until sessionType is changed from LOGGED_OUT
+		do {
+
+			// ask user for command
+			out.println("Please login:");
+			input = in.nextLine();
+
+			switch (input) {
+			case "login":
+				// login to the system
+				login();
+				break;
+			case "exit":
+				// exit the program
+				System.exit(0);
+				break;
+			default:
+				// invalid command
+				System.out.println("Invalid command.");
+			}
+
+		} while (sessionType == LOGGED_OUT);
+
 		boolean loggedIn = true;
 		while (loggedIn) {
 			loggedIn = transaction();
@@ -86,8 +107,7 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validAccount(String acc) {
-		if (acc.matches("[0-9]+") && (acc.length() == 8)
-				&& !acc.startsWith("0"))
+		if (acc.matches("[0-9]+") && (acc.length() == 8) && !acc.startsWith("0"))
 			return true;
 		else
 			return false;
@@ -115,8 +135,7 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validName(String name) {
-		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ")
-				&& !name.endsWith(" "))
+		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
 			return true;
 		else
 			return false;
@@ -129,8 +148,7 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validAmount(String amount) {
-		if (amount.matches("[0-9]+") && (amount.length() >= 3)
-				&& (amount.length() <= 8))
+		if (amount.matches("[0-9]+") && (amount.length() >= 3) && (amount.length() <= 8))
 			return true;
 		else
 			return false;
@@ -159,14 +177,12 @@ public class SimBank {
 	 * 
 	 * @return a string following the format of the Transaction Summary File
 	 */
-	private static String toTransMsg(String tranCode, String accNum1,
-			String accNum2, int amount, String name) {
+	private static String toTransMsg(String tranCode, String accNum1, String accNum2, int amount, String name) {
 		String amountString = "";
 
 		// if transaction code is not 2 characters, print error message
 		if (tranCode.length() != 2)
-			System.out
-					.println("ERROR: Transaction code is not the correct length.");
+			System.out.println("ERROR: Transaction code is not the correct length.");
 
 		// check if any accNum are not used
 		if (accNum1.isEmpty())
@@ -174,7 +190,7 @@ public class SimBank {
 		if (accNum2.isEmpty())
 			accNum2 = "00000000";
 
-		// pad the ammount
+		// pad the amount
 		// convert amount to a string
 		if (amount == 0)
 			amountString = "000";
@@ -190,8 +206,7 @@ public class SimBank {
 			name = "***";
 
 		// creates string using parameters
-		String s = tranCode + " " + accNum1 + " " + accNum2 + " "
-				+ amountString + " " + name;
+		String s = tranCode + " " + accNum1 + " " + accNum2 + " " + amountString + " " + name;
 		return s;
 	}
 
@@ -215,6 +230,7 @@ public class SimBank {
 		// While loop used for repeated prompt after invalid command.
 		out.println("logout? Transaction?");
 		input = in.nextLine();
+
 		switch (input) {
 		case "create":
 			return transactionCreate();
@@ -239,27 +255,23 @@ public class SimBank {
 	 * inputs are valid.
 	 */
 	private void login() {
-		do {
-			// login
-			out.println("Please login:");
+		
+		// exits loop once valid input is detected
+		while (true) { 
+			out.println("atm or agent?");
 			input = in.nextLine();
-			// check for valid input
-			if (input.equals("login")) {
-				while (true) { // exits loop once a valid input detected
-					out.println("atm or agent?");
-					input = in.nextLine();
-					if (input.equals("atm")) {
-						sessionType = ATM_MODE;
-						out.println("Logged in as atm.");
-						break;
-					} else if (input.equals("agent")) {
-						sessionType = AGENT_MODE;
-						out.println("Logged in as agent.");
-						break;
-					}
-				}
+			
+			
+			if (input.equals("atm")) {
+				sessionType = ATM_MODE;
+				out.println("Logged in as atm.");
+				break;
+			} else if (input.equals("agent")) {
+				sessionType = AGENT_MODE;
+				out.println("Logged in as agent.");
+				break;
 			}
-		} while (sessionType == LOGGED_OUT);
+		}
 	}
 
 	/**
@@ -363,8 +375,7 @@ public class SimBank {
 
 					a.deposit(amount);
 
-					System.out.println(num + " deposited into account " + acc
-							+ ".");
+					System.out.println(num + " deposited into account " + acc + ".");
 
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("DE", acc, "", amount, ""));
@@ -437,8 +448,7 @@ public class SimBank {
 			acc1.withdraw(amountInt);
 			acc2.deposit(amountInt);
 
-			System.out.println("Transferred " + amountInt + " " + accNum1
-					+ " to " + accNum2);
+			System.out.println("Transferred " + amountInt + " " + accNum1 + " to " + accNum2);
 
 			// create transaction message and add it to tranSummary array
 			tranSummary.add(toTransMsg("TR", accNum2, accNum1, amountInt, ""));
@@ -474,8 +484,7 @@ public class SimBank {
 				try {
 
 					a.withdraw(amount);
-					System.out.println(num + " withdrawn from account " + acc
-							+ ".");
+					System.out.println(num + " withdrawn from account " + acc + ".");
 
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("WD", "", acc, amount, ""));
@@ -505,16 +514,14 @@ public class SimBank {
 		// export tranSum array into textfile
 		// overwrites if file already exists
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(
-					TRANSACTION_SUMMARY_FILENAME));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_SUMMARY_FILENAME));
 			for (String str : tranSummary) {
 				writer.write(str);
 				writer.newLine();
 			}
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("error writing to file: "
-					+ TRANSACTION_SUMMARY_FILENAME);
+			System.out.println("error writing to file: " + TRANSACTION_SUMMARY_FILENAME);
 			e.printStackTrace();
 			System.exit(1);
 		}
