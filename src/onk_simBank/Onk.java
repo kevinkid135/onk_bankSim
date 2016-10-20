@@ -32,9 +32,27 @@ package onk_simBank;
  */
 public class Onk {
 
+	private static String accountsListFilename;
+	private static String transactionSummaryFilename;
+
+	/**
+	 * Initiates SimBank. It sets the accounts list filename and the transaction
+	 * summary file filename to the command line arguments (args[0] and
+	 * args[1]). It creates session objects, and allows the program to be
+	 * continuously run despite the termination of a session. As a result,
+	 * SimBank will not cease functioning when the session is switched from atm
+	 * to agent, or vice versa.
+	 * 
+	 * @param args - the filenames for the accounts list and the transaction summary file respectively
+	 * @throws InvalidInput
+	 */
 	public static void main(String[] args) throws InvalidInput {
 		// create a bank instance
 		SimBank s = new SimBank();
+
+		// set accounts list and transaction summary file filenames
+		accountsListFilename = args[0];
+		transactionSummaryFilename = args[1];
 
 		while (true)
 			// since program never ends (until 'exit' transaction),
@@ -42,4 +60,21 @@ public class Onk {
 			s.start();
 	}// end main
 
+	/**
+	 * Getter: Returns the filename for the accounts list file.
+	 * 
+	 * @return filename for the accounts list file
+	 */
+	public static String getAccountsListFilename() {
+		return accountsListFilename;
+	}
+
+	/**
+	 * Getter: Returns the filename for the transaction summary file.
+	 * 
+	 * @return filename for the transaction summary file
+	 */
+	public static String getTranSummaryFilename() {
+		return transactionSummaryFilename;
+	}
 }

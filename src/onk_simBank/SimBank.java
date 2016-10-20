@@ -22,7 +22,9 @@ import java.util.*;
  * The user may terminate the program whenever they are asked to login.
  * 
  * Inputs: Valid accounts list file with filename corresponding to value of
- * ACCOUNT_LIST_FILENAME Outputs: Transaction summary file with filename
+ * ACCOUNT_LIST_FILENAME 
+ * 
+ * Outputs: Transaction summary file with filename
  * corresponding to value of TRANSACTION_SUMMARY_FILENAME
  * 
  * @author Team onk
@@ -37,12 +39,12 @@ public class SimBank {
 	static int sessionType = LOGGED_OUT;
 
 	static ArrayList<Account> accList;
-	final String ACCOUNT_LIST_FILENAME = "accountList.txt"; // filename of valid
+	final String ACCOUNT_LIST_FILENAME = Onk.getAccountsListFilename(); // "accountList.txt"; // filename of valid
 															// accounts list
 															// file
 
 	static ArrayList<String> tranSummary;
-	final String TRANSACTION_SUMMARY_FILENAME = "tranSum.txt"; // filename of
+	String TRANSACTION_SUMMARY_FILENAME = Onk.getTranSummaryFilename(); // "tranSum.txt"; // filename of
 																// transaction
 																// summary file
 
