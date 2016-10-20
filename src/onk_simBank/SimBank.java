@@ -8,7 +8,22 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Session Object
+ * A SimBank session class. It takes in input commands and conducts
+ * transactions.
+ * 
+ * Starts by asking user to login and subsequently for a session type, followed
+ * by reading in the valid accounts file after successful login.
+ * 
+ * User can then enter any transactions that their session type permits them to.
+ * Or, they may logout at which point the session ends and all transactions
+ * during the session are written into the transaction summary file.
+ * 
+ * The user may then start another session as the program asks for a login.
+ * 
+ * The user may terminate the program whenever they are asked to login.
+ * 
+ * Inputs: Valid accounts list file with filename corresponding to value of ACCOUNT_LIST_FILENAME
+ * Outputs: Transaction summary file with filename corresponding to value of TRANSACTION_SUMMARY_FILENAME
  * 
  * @author Team onk
  *
@@ -20,10 +35,10 @@ public class SimBank {
 	static int sessionType = LOGGED_OUT;
 
 	static ArrayList<Account> accList;
-	final String ACCOUNT_LIST_FILENAME = "accountList.txt";
+	final String ACCOUNT_LIST_FILENAME = "accountList.txt"; // filename of valid accounts list file
 
 	static ArrayList<String> tranSummary;
-	final String TRANSACTION_SUMMARY_FILENAME = "tranSum.txt";
+	final String TRANSACTION_SUMMARY_FILENAME = "tranSum.txt"; // filename of transaction summary file
 
 	Scanner in = new Scanner(System.in); // new scanner object
 	String input; // used for user input
