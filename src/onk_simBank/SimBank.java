@@ -22,36 +22,43 @@ import java.util.*;
  * 
  * The user may terminate the program whenever they are asked to login.
  * 
- * Inputs: Valid accounts list file with filename corresponding to value of ACCOUNT_LIST_FILENAME
- * Outputs: Transaction summary file with filename corresponding to value of TRANSACTION_SUMMARY_FILENAME
+ * Inputs: Valid accounts list file with filename corresponding to value of
+ * ACCOUNT_LIST_FILENAME Outputs: Transaction summary file with filename
+ * corresponding to value of TRANSACTION_SUMMARY_FILENAME
  * 
  * @author Team onk
  *
  */
 public class SimBank {
+	
+	// declare constants indicating the current session type
 	static final int LOGGED_OUT = 0;
 	static final int ATM_MODE = 1;
 	static final int AGENT_MODE = 2;
 	static int sessionType = LOGGED_OUT;
 
 	static ArrayList<Account> accList;
-	final String ACCOUNT_LIST_FILENAME = "accountList.txt"; // filename of valid accounts list file
+	final String ACCOUNT_LIST_FILENAME = "accountList.txt"; // filename of valid
+															// accounts list
+															// file
 
 	static ArrayList<String> tranSummary;
-	final String TRANSACTION_SUMMARY_FILENAME = "tranSum.txt"; // filename of transaction summary file
+	final String TRANSACTION_SUMMARY_FILENAME = "tranSum.txt"; // filename of
+																// transaction
+																// summary file
 
 	Scanner in = new Scanner(System.in); // new scanner object
 	String input; // used for user input
 
 	/**
-	 * Starts the session by importing the accounList file, into an array. Also
-	 * Initializes the tranSummary array to be placed into the Transaction
-	 * Summary file. Proceeds to ask user to login and handles the transactions
-	 * depending on what state the session is in.
+	 * Starts the session by asking the user to login until either 'login' or
+	 * 'exit' is entered.
 	 * 
-	 * @throws InvalidInput
+	 * If 'login', goes to login() and asks for transactions afterwards.
+	 * 
+	 * If 'exit', the program is terminated.
 	 */
-	public void start() throws InvalidInput {
+	public void start() {
 
 		// keep asking for login until sessionType is changed from LOGGED_OUT
 		do {
@@ -76,6 +83,8 @@ public class SimBank {
 
 		} while (sessionType == LOGGED_OUT);
 
+		// continuously runs transaction()
+		// until loggedIn is set to false by result of transaction()
 		boolean loggedIn = true;
 		while (loggedIn) {
 			loggedIn = transaction();
@@ -83,7 +92,8 @@ public class SimBank {
 	}
 
 	/**
-	 * Check if an account already exists in accList
+	 * Returns if an account matching the entered account number is in the
+	 * accList array.
 	 * 
 	 * @param acc
 	 *            is the account number to be checked
@@ -91,6 +101,9 @@ public class SimBank {
 	 */
 	public boolean accountExist(String acc) {
 		int accNum = Integer.parseInt(acc);
+
+		// iterate through the accList until an Account with the matching
+		// account number is found
 		for (Account a : accList) {
 			if (accNum == a.getAccNum())
 				return true;
@@ -99,10 +112,15 @@ public class SimBank {
 	}
 
 	/**
-	 * Checks if account number is valid syntactically
+	 * Return if the account number is valid syntactically.
+	 * 
+	 * An account number is valid syntactically if it consists of only
+	 * alphanumeric characters, has a length of 8 characters, and does not start
+	 * with 0.
 	 * 
 	 * @param acc
-	 * @return
+	 * @return true if the account number is valid syntactically, false
+	 *         otherwise
 	 */
 	public boolean validAccount(String acc) {
 		if (acc.matches("[0-9]+") && (acc.length() == 8) && !acc.startsWith("0"))
@@ -112,13 +130,17 @@ public class SimBank {
 	}
 
 	/**
-	 * Finds if the account is in the accList array
+	 * Returns the Account matching the entered account number, if the account
+	 * is in the accList array.
 	 * 
 	 * @param accNum
-	 * @return true if found, and false if not found
+	 * @return the corresponding Account if found, null if not found
 	 */
 	public Account findAccount(String accNum) {
 		int acc = Integer.parseInt(accNum);
+
+		// iterate through the accList until an Account with the matching
+		// account number is found
 		for (Account a : accList) {
 			if (a.getAccNum() == acc)
 				return a;
@@ -127,10 +149,13 @@ public class SimBank {
 	}
 
 	/**
-	 * Checks if account name is valid syntactically
+	 * Returns if the account name is valid syntactically.
+	 * 
+	 * An account name is valid syntactically if it has a length between 3 and
+	 * 30 (inclusive), and does not start or end with spaces.
 	 * 
 	 * @param name
-	 * @return
+	 * @return true if the account name is valid syntactically, false otherwise
 	 */
 	public boolean validName(String name) {
 		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
@@ -140,10 +165,13 @@ public class SimBank {
 	}
 
 	/**
-	 * Checks if the amount entered is valid syntactically
+	 * Returns if the amount entered is valid syntactically.
+	 * 
+	 * An amount is valid syntactically if it only consists of numeric
+	 * characters, and has a length between 3 and 8 (inclusive).
 	 * 
 	 * @param amount
-	 * @return
+	 * @return true if the amount is valid syntactically, false otherwise
 	 */
 	public boolean validAmount(String amount) {
 		if (amount.matches("[0-9]+") && (amount.length() >= 3) && (amount.length() <= 8))
@@ -153,8 +181,11 @@ public class SimBank {
 	}
 
 	/**
-	 * Converts the transaction command into a string following the format of
-	 * the Transaction Summary File.
+	 * Takes in the transaction code, 'to' account number, 'from' account
+	 * number, amount, and account name.
+	 * 
+	 * Converts these values into a string following the format of a transaction
+	 * message in the Transaction Summary File.
 	 * 
 	 * @param tranCode
 	 *            is a two letter transaction code, where DE-deposit,
@@ -173,7 +204,7 @@ public class SimBank {
 	 * @param name
 	 *            is the account name. If unused, input empty string ("")
 	 * 
-	 * @return a string following the format of the Transaction Summary File
+	 * @return a string following the format of a transaction message in the Transaction Summary File
 	 */
 	private static String toTransMsg(String tranCode, String accNum1, String accNum2, int amount, String name) {
 		String amountString = "";
@@ -182,14 +213,15 @@ public class SimBank {
 		if (tranCode.length() != 2)
 			System.out.println("ERROR: Transaction code is not the correct length.");
 
-		// check if any accNum are not used
+		// check if any account numbers are not used
+		// change to default 00000000 if not used
 		if (accNum1.isEmpty())
 			accNum1 = "00000000";
 		if (accNum2.isEmpty())
 			accNum2 = "00000000";
 
-		// pad the amount
-		// convert amount to a string
+		// pad the amount to 3 digits (if less than 3 digits)
+		// and convert amount to a string
 		if (amount == 0)
 			amountString = "000";
 		else if (amount < 10)
@@ -200,32 +232,31 @@ public class SimBank {
 			amountString = String.valueOf(amount);
 
 		// check if name parameter is not used
+		// change to default *** if not used
 		if (name.isEmpty())
 			name = "***";
 
-		// creates string using parameters
+		// create and return transaction message string
 		String s = tranCode + " " + accNum1 + " " + accNum2 + " " + amountString + " " + name;
 		return s;
 	}
 
 	/**
-	 * Signifies what state the current session is. 0 for not logged in, 1 for
-	 * atm, 2 for agent.
+	 * Return the current session type for this session.
 	 * 
-	 * @return sessionType.
+	 * @return sessionType, the current session type
 	 */
 	public static int getSessionType() {
 		return sessionType;
 	}
 
 	/**
-	 * Calls transaction functions, according to user input
+	 * Asks for a transaction, and calls the appropriate function.
+	 * Prints Invalid command if transaction command does not of the listed
 	 * 
-	 * @return false only when logging out
-	 * @throws InvalidInput
+	 * @return false if logging out, true otherwise
 	 */
-	private boolean transaction() throws InvalidInput {
-		// While loop used for repeated prompt after invalid command.
+	private boolean transaction() {
 		out.println("logout? Transaction?");
 		input = in.nextLine();
 
@@ -250,8 +281,9 @@ public class SimBank {
 
 	/**
 	 * Asks for the session type (atm or agent mode) until valid input is
-	 * entered, and reads in the valid accounts file in accList and initializes
-	 * the tranSummary array
+	 * entered. Proceeds to read in the valid accounts file in accList and
+	 * initializes the tranSummary array to be placed into the transaction
+	 * summary file.
 	 */
 	private void login() {
 
@@ -377,7 +409,7 @@ public class SimBank {
 	 * @return true to signify that the user is still logged in.
 	 * @throws InvalidInput
 	 */
-	private boolean transactionDeposit() throws InvalidInput {
+	private boolean transactionDeposit() {
 
 		System.out.println("Account number?");
 		String acc = in.nextLine();
