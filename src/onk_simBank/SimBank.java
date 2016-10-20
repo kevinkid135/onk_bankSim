@@ -37,23 +37,6 @@ public class SimBank {
 	 * @throws InvalidInput
 	 */
 	public void start() throws InvalidInput {
-		accList = new ArrayList<Account>();
-		tranSummary = new ArrayList<String>();
-
-		// read in file and import account list into accList array
-		try (BufferedReader br = new BufferedReader(new FileReader(ACCOUNT_LIST_FILENAME))) {
-
-			String currentLine;
-			while ((currentLine = br.readLine()) != null) {
-				Account tempAcc = new Account(Integer.parseInt(currentLine));
-				accList.add(tempAcc);
-			}
-
-		} catch (IOException e) {
-			System.out.println(ACCOUNT_LIST_FILENAME + " cannot be found");
-			e.printStackTrace();
-			System.exit(1);
-		}
 
 		// keep asking for login until sessionType is changed from LOGGED_OUT
 		do {
@@ -251,17 +234,17 @@ public class SimBank {
 	}// End transaction method
 
 	/**
-	 * prompts user to login, and enter atm or agent. Also check whether or not
-	 * inputs are valid.
+	 * Asks for the session type (atm or agent mode) until valid input is
+	 * entered, and reads in the valid accounts file in accList and initializes
+	 * the tranSummary array
 	 */
 	private void login() {
-		
+
 		// exits loop once valid input is detected
-		while (true) { 
+		while (true) {
 			out.println("atm or agent?");
 			input = in.nextLine();
-			
-			
+
 			if (input.equals("atm")) {
 				sessionType = ATM_MODE;
 				out.println("Logged in as atm.");
@@ -272,6 +255,31 @@ public class SimBank {
 				break;
 			}
 		}
+
+		// read in valid accounts file after session type is accepted (loop
+		// exited)
+
+		accList = new ArrayList<Account>();
+		tranSummary = new ArrayList<String>();
+
+		// read in file
+		try (BufferedReader br = new BufferedReader(new FileReader(ACCOUNT_LIST_FILENAME))) {
+
+			// add every line/account from the valid accounts file into the
+			// accList array
+			String currentLine;
+			while ((currentLine = br.readLine()) != null) {
+
+				Account tempAcc = new Account(Integer.parseInt(currentLine));
+				accList.add(tempAcc);
+			}
+
+		} catch (IOException e) {
+			System.out.println("Error: There was a problem while reading " + ACCOUNT_LIST_FILENAME);
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 	}
 
 	/**
