@@ -61,7 +61,8 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validAccount(String acc) {
-		if (acc.matches("[0-9]+") && (acc.length() == 8) && !acc.startsWith("0"))
+		if (acc.matches("[0-9]+") && (acc.length() == 8)
+				&& !acc.startsWith("0"))
 			return true;
 		else
 			return false;
@@ -89,7 +90,8 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validName(String name) {
-		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
+		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ")
+				&& !name.endsWith(" "))
 			return true;
 		else
 			return false;
@@ -102,7 +104,8 @@ public class SimBank {
 	 * @return
 	 */
 	public boolean validAmount(String amount) {
-		if (amount.matches("[0-9]+") && (amount.length() >= 3) && (amount.length() <= 8))
+		if (amount.matches("[0-9]+") && (amount.length() >= 3)
+				&& (amount.length() <= 8))
 			return true;
 		else
 			return false;
@@ -302,28 +305,28 @@ public class SimBank {
 	 * @throws InvalidInput
 	 */
 	private boolean transactionDeposit() throws InvalidInput {
-		
+
 		System.out.println("Account number?");
 		String acc = in.nextLine();
-		
+
 		// check if it's valid and in accList
 		if (validAccount(acc) && accountExist(acc)) {
 
 			System.out.println("Amount?");
 			String num = in.nextLine();
-			
+
 			// check if syntax of amount is appropriate
 			if (validAmount(num)) {
 				int amount = Integer.parseInt(num);
-				
+
 				// find account and check if deposit is valid
 				Account a = findAccount(acc);
 				try {
-					
+
 					a.deposit(amount);
 					System.out.println(num + " deposited into account " + acc
 							+ ".");
-					
+
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("DE", acc, "", amount, ""));
 				} catch (InvalidInput e) {
@@ -389,7 +392,8 @@ public class SimBank {
 			acc1.withdraw(amountInt);
 			acc2.deposit(amountInt);
 
-			System.out.println("Transferred " + amountInt + " " + accNum1 + " to " + accNum2);
+			System.out.println("Transferred " + amountInt + " " + accNum1
+					+ " to " + accNum2);
 			// String transMessage = toTransMsg(); // UNFINISHED; need to get
 			// the updates
 
@@ -411,15 +415,33 @@ public class SimBank {
 		System.out.println("Account number?");
 		String acc = in.nextLine();
 
-		// KEVIN TO DO
+		// check if it's valid and in accList
+		if (validAccount(acc) && accountExist(acc)) {
 
-		// validAccount()
-		if (validAccount(acc)) {
+			System.out.println("Amount?");
+			String num = in.nextLine();
 
-		}
-		// validAmount()
-		// do transaction
+			// check if syntax of amount is appropriate
+			if (validAmount(num)) {
+				int amount = Integer.parseInt(num);
 
+				// find account and check if withdraw is valid
+				Account a = findAccount(acc);
+				try {
+
+					a.withdraw(amount);
+					System.out.println(num + " withdrawn from account " + acc
+							+ ".");
+
+					// create and add transaction message to tranSummary array
+					tranSummary.add(toTransMsg("WD", "", acc, amount, ""));
+				} catch (InvalidInput e) {
+					System.out.println(e.getMessage());
+				}
+			} else
+				System.out.println("Invalid amount");
+		} else
+			System.out.println("Invalid account number.");
 		return true;
 	}
 
