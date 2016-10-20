@@ -131,12 +131,10 @@ public class SimBank {
 	 * 
 	 * @return a string following the format of the Transaction Summary File
 	 */
-	private static String toTransMsg(String tranCode, String accNum1,
-			String accNum2, int amount, String name) {
+	private static String toTransMsg(String tranCode, String accNum1, String accNum2, int amount, String name) {
 		// if transaction code is not 2 characters, print error message
 		if (tranCode.length() != 2)
-			System.out
-					.println("ERROR: Transaction code is not the correct length.");
+			System.out.println("ERROR: Transaction code is not the correct length.");
 
 		// check if any accNum are not used
 		if (accNum1.isEmpty())
@@ -149,8 +147,7 @@ public class SimBank {
 			name = "***";
 
 		// creates string using parameters
-		String s = tranCode + " " + accNum1 + " " + accNum2 + " " + amount
-				+ " " + name;
+		String s = tranCode + " " + accNum1 + " " + accNum2 + " " + amount + " " + name;
 		return s;
 	}
 
@@ -302,28 +299,27 @@ public class SimBank {
 	 * @throws InvalidInput
 	 */
 	private boolean transactionDeposit() throws InvalidInput {
-		
+
 		System.out.println("Account number?");
 		String acc = in.nextLine();
-		
+
 		// check if it's valid and in accList
 		if (validAccount(acc) && accountExist(acc)) {
 
 			System.out.println("Amount?");
 			String num = in.nextLine();
-			
+
 			// check if syntax of amount is appropriate
 			if (validAmount(num)) {
 				int amount = Integer.parseInt(num);
-				
+
 				// find account and check if deposit is valid
 				Account a = findAccount(acc);
 				try {
-					
+
 					a.deposit(amount);
-					System.out.println(num + " deposited into account " + acc
-							+ ".");
-					
+					System.out.println(num + " deposited into account " + acc + ".");
+
 					// create and add transaction message to tranSummary array
 					tranSummary.add(toTransMsg("DE", acc, "", amount, ""));
 				} catch (InvalidInput e) {
@@ -344,7 +340,9 @@ public class SimBank {
 	 */
 	private boolean transactionTransfer() {
 
-		// ask user for account number to transfer FROM
+		// account number FROM
+
+		// ask user for account number to transfer from
 		System.out.println("Account number?");
 		String accNum1 = in.nextLine();
 
@@ -355,7 +353,9 @@ public class SimBank {
 			return true;
 		}
 
-		// ask user for account number to transfer TO
+		// account number TO
+
+		// ask user for account number to transfer to
 		System.out.println("Account number?");
 		String accNum2 = in.nextLine();
 
@@ -365,6 +365,8 @@ public class SimBank {
 			System.out.println("Invalid account number.");
 			return true;
 		}
+
+		// AMOUNT
 
 		// ask user for AMOUNT to transfer
 		System.out.println("Amount?");
@@ -390,8 +392,9 @@ public class SimBank {
 			acc2.deposit(amountInt);
 
 			System.out.println("Transferred " + amountInt + " " + accNum1 + " to " + accNum2);
-			// String transMessage = toTransMsg(); // UNFINISHED; need to get
-			// the updates
+
+			// create transaction message and add it to tranSummary array
+			tranSummary.add(toTransMsg("TR", accNum2, accNum1, amountInt, ""));
 
 		} catch (InvalidInput e) {
 			System.out.println(e.getMessage());
