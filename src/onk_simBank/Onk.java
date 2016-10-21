@@ -22,10 +22,10 @@ package onk_simBank;
  * are asked to login.
  * 
  * Inputs: Valid accounts list file with filename corresponding to value of
- * ACCOUNT_LIST_FILENAME
+ * accListFilename
  * 
  * Outputs: Transaction summary file with filename corresponding to value of
- * TRANSACTION_SUMMARY_FILENAME
+ * tranSumFilename
  * 
  * @author Team Onk
  *
@@ -51,7 +51,7 @@ public class Onk {
 		SimBank s = new SimBank();
 
 		// set accounts list and transaction summary file filenames
-		accountsListFilename = args[0];
+		accountsListFilename = "accountList.txt";
 		transactionSummaryFilename = args[1];
 
 		while (true)

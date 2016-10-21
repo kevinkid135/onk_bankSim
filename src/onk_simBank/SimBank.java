@@ -22,10 +22,10 @@ import java.util.*;
  * The user may terminate the program whenever they are asked to login.
  * 
  * Inputs: Valid accounts list file with filename corresponding to value of
- * ACCOUNT_LIST_FILENAME 
+ * accListFilename
  * 
- * Outputs: Transaction summary file with filename
- * corresponding to value of TRANSACTION_SUMMARY_FILENAME
+ * Outputs: Transaction summary file with filename corresponding to value of
+ * tranSumFilename
  * 
  * @author Team onk
  *
@@ -39,21 +39,19 @@ public class SimBank {
 	static int sessionType = LOGGED_OUT;
 
 	static ArrayList<Account> accList;
-	final String ACCOUNT_LIST_FILENAME = Onk.getAccountsListFilename(); // "accountList.txt"; // filename of valid
-															// accounts list
-															// file
+	// filename of valid accounts list file
+	String accListFilename; // "accountList.txt";
 
 	static ArrayList<String> tranSummary;
-	String TRANSACTION_SUMMARY_FILENAME = Onk.getTranSummaryFilename(); // "tranSum.txt"; // filename of
-																// transaction
-																// summary file
+	// filename of transaction summary file
+	String tranSumFilename; // "tranSum.txt";
 
 	Scanner in = new Scanner(System.in); // new scanner object
 	String input; // used for user input
 
 	/**
-	 * Starts a new session by asking the user to login. 
-	 * Continuously prompts user to login until either 'login' or 'exit' is entered. 
+	 * Starts a new session by asking the user to login. Continuously prompts
+	 * user to login until either 'login' or 'exit' is entered.
 	 * 
 	 * If 'login', goes to login() and asks for transactions afterwards.
 	 * 
@@ -315,10 +313,14 @@ public class SimBank {
 		// exited)
 
 		accList = new ArrayList<Account>();
+		accListFilename = Onk.getAccountsListFilename();
+		
 		tranSummary = new ArrayList<String>();
+		tranSumFilename = Onk.getTranSummaryFilename();
+
 
 		// read in file
-		try (BufferedReader br = new BufferedReader(new FileReader(ACCOUNT_LIST_FILENAME))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(accListFilename))) {
 
 			// add every line/account from the valid accounts file into the
 			// accList array
@@ -330,7 +332,7 @@ public class SimBank {
 			}
 
 		} catch (IOException e) {
-			System.out.println("Error: There was a problem while reading " + ACCOUNT_LIST_FILENAME);
+			System.out.println("Error: There was a problem while reading " + accListFilename);
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -603,32 +605,34 @@ public class SimBank {
 	 * tranSummary array. Return false to signify user is logging out.
 	 * 
 	 * Export all transaction summary file messages into a file with the name of
-	 * the value of TRANSACTION_SUMMARY_FILENAME. If file doesn't exist, it will
+	 * the value of tranSumFilename. If file doesn't exist, it will
 	 * create it. If file already exists, it will overwrite it.
 	 * 
 	 * @return false to signify the user has logged out
 	 */
 	private boolean transactionLogout() {
-		
+
 		// indicate logged out session type
 		sessionType = LOGGED_OUT;
 
 		// add end of session message to tranSummary
 		tranSummary.add(toTransMsg("ES", "", "", 0, ""));
 
-		// export tranSummary array into file with the name of value of TRANSACTION_SUMMARY_FILENAME
-		// create new the file if it doesn't exist, overwrite it if the file already exists
+		// export tranSummary array into file with the name of value of tranSumFilename
+		// create new the file if it doesn't exist, overwrite it if the file
+		// already exists
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_SUMMARY_FILENAME));
-			
-			// iterate through tranSummary array and write each message to a new line
+			BufferedWriter writer = new BufferedWriter(new FileWriter(tranSumFilename));
+
+			// iterate through tranSummary array and write each message to a new
+			// line
 			for (String str : tranSummary) {
 				writer.write(str);
 				writer.newLine();
 			}
 			writer.close();
 		} catch (IOException e) {
-			System.out.println("Error writing to file: " + TRANSACTION_SUMMARY_FILENAME);
+			System.out.println("Error writing to file: " + tranSumFilename);
 			e.printStackTrace();
 			System.exit(1);
 		}
