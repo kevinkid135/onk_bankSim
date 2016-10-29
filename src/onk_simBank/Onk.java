@@ -51,7 +51,7 @@ public class Onk {
 		SimBank s = new SimBank();
 
 		// set accounts list and transaction summary file filenames
-		accountsListFilename = "accountList.txt";
+		accountsListFilename = args[0];
 		transactionSummaryFilename = args[1];
 
 		while (true)
