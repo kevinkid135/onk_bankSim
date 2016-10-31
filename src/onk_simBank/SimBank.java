@@ -278,7 +278,7 @@ public class SimBank {
 		case "logout":
 			return transactionLogout(); // will return false
 		default:
-			System.out.println("Invalid command");
+			System.out.println("Invalid command.");
 			return true; // notifies that the user is still logged in
 		}// Close switch statement
 
@@ -544,7 +544,7 @@ public class SimBank {
 			acc1.withdraw(amountInt);
 			acc2.deposit(amountInt);
 
-			System.out.println("Transferred " + amountInt + " " + accNum1 + " to " + accNum2);
+			System.out.println("Transferred " + amountInt + " from " + accNum1 + " to " + accNum2);
 
 			// create transaction message and add it to tranSummary array
 			tranSummary.add(toTransMsg("TR", accNum2, accNum1, amountInt, ""));
