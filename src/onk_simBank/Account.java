@@ -54,8 +54,8 @@ public class Account {
 			// atm limit of 1000 per transaction, 1000 per session
 			if (num > 100000)
 				throw new InvalidInput("Invalid amount.");
-			else if (num < 0)
-				throw new InvalidInput("Invalid amount.");
+			else if (num < 100)
+				throw new InvalidInput("Invalid amount. Amount less than 100.");
 			else if ((withdrawTotal + num) > 100000)
 				throw new InvalidInput("Invalid amount.");
 			else {
@@ -66,9 +66,9 @@ public class Account {
 
 			// agent limit of 99999999 per transaction, no limit per session
 			if (num > 99999999)
-				throw new InvalidInput("Invalid amount.");
-			else if (num < 0)
-				throw new InvalidInput("Invalid amount.");
+				throw new InvalidInput("Invalid amount. Amount exceeds 99999999.");
+			else if (num < 100)
+				throw new InvalidInput("Invalid amount. Amount less than 100.");
 			else {
 				withdrawTotal += num;
 				return true;
