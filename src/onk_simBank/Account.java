@@ -5,7 +5,6 @@ package onk_simBank;
  * and to check if withdraw/deposit amounts are valid.
  * 
  * @author Team Onk
- *
  */
 public class Account {
 	private int accNum;
@@ -53,11 +52,11 @@ public class Account {
 		if (sessionType == SimBank.ATM_MODE) {
 
 			// atm limit of 1000 per transaction, 1000 per session
-			if (num > 1000)
+			if (num > 100000)
 				throw new InvalidInput("Invalid amount.");
 			else if (num < 0)
 				throw new InvalidInput("Invalid amount.");
-			else if ((withdrawTotal + num) > 1000)
+			else if ((withdrawTotal + num) > 100000)
 				throw new InvalidInput("Invalid amount.");
 			else {
 				withdrawTotal += num;
