@@ -157,7 +157,7 @@ public class SimBank {
 	 * @return true if the account name is valid syntactically, false otherwise
 	 */
 	public boolean validName(String name) {
-		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" "))
+		if (name.length() >= 3 && name.length() <= 30 && !name.startsWith(" ") && !name.endsWith(" ") && name.matches("[A-Za-z0-9]+"))
 			return true;
 		else
 			return false;
@@ -376,9 +376,9 @@ public class SimBank {
 						System.out.println("Account " + acc + " created.");
 						tranSummary.add(toTransMsg("CR", acc, "", 0, name));
 					} else
-						System.out.println("Invalid account name");
+						System.out.println("Invalid account name.");
 				} else {
-					System.out.println("Account already exists");
+					System.out.println("Account already exists.");
 				}
 			} else
 				System.out.println("Invalid account number.");
@@ -429,7 +429,7 @@ public class SimBank {
 					System.out.println("Account " + acc + " deleted.");
 					tranSummary.add(toTransMsg("DL", acc, "", 0, name));
 				} else {
-					System.out.println("Account already exists");
+					System.out.println("Account already exists.");
 				}
 			} else
 				System.out.println("Invalid account number.");
@@ -594,7 +594,7 @@ public class SimBank {
 					System.out.println(e.getMessage());
 				}
 			} else
-				System.out.println("Invalid amount");
+				System.out.println("Invalid amount.");
 		} else
 			System.out.println("Invalid account number.");
 		return true;
