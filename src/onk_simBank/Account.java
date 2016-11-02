@@ -33,9 +33,9 @@ public class Account {
 
 	/**
 	 * Checks if the withdraw amount for the current account is within the
-	 * constraints. In atm mode, only withdrawals of 1000 and under are
+	 * constraints. In atm mode, only withdrawals of 100000 and under are
 	 * accepted. In agent mode, only withdrawals of 99999999 and under are
-	 * accepted. There is a total withdrawal limit of 1000 per account in atm
+	 * accepted. There is a total withdrawal limit of 100000 per account in atm
 	 * mode, and no limit in agent mode.
 	 * 
 	 * @param num
@@ -51,13 +51,13 @@ public class Account {
 		// check for valid withdraw amount
 		if (sessionType == SimBank.ATM_MODE) {
 
-			// atm limit of 1000 per transaction, 1000 per session
+			// atm limit of 100000 per transaction, 100000 per session
 			if (num > 100000)
+				throw new InvalidInput("Invalid amount. Amount exceeds 100000.");
+			else if (num < 0)
 				throw new InvalidInput("Invalid amount.");
-			else if (num < 100)
-				throw new InvalidInput("Invalid amount. Amount less than 100.");
 			else if ((withdrawTotal + num) > 100000)
-				throw new InvalidInput("Invalid amount.");
+				throw new InvalidInput("Invalid amount. Amount exceeds total limit of 100000.");
 			else {
 				withdrawTotal += num;
 				return true;
@@ -67,8 +67,8 @@ public class Account {
 			// agent limit of 99999999 per transaction, no limit per session
 			if (num > 99999999)
 				throw new InvalidInput("Invalid amount. Amount exceeds 99999999.");
-			else if (num < 100)
-				throw new InvalidInput("Invalid amount. Amount less than 100.");
+			else if (num < 0)
+				throw new InvalidInput("Invalid amount.");
 			else {
 				withdrawTotal += num;
 				return true;
@@ -81,7 +81,7 @@ public class Account {
 
 	/**
 	 * Checks if the deposit amount for the current account is within the
-	 * constraints. In atm mode, only withdrawals of 1000 and under are
+	 * constraints. In atm mode, only withdrawals of 100000 and under are
 	 * accepted. In agent mode, only withdrawals of 99999999 and under are
 	 * accepted.
 	 * 
@@ -98,8 +98,8 @@ public class Account {
 		// check for valid deposit amount
 		if (sessionType == 1) {
 
-			// atm limit of 1000 per transaction, 1000 per session
-			if (num > 1000) {
+			// atm limit of 100000 per transaction, 100000 per session
+			if (num > 100000) {
 				throw new InvalidInput("Invalid amount.");
 			} else if (num < 0)
 				throw new InvalidInput("Invalid amount.");
@@ -110,7 +110,7 @@ public class Account {
 
 			// agent limit of 99999999 per transaction, no limit per session
 			if (num > 99999999)
-				throw new InvalidInput("Invalid amount.");
+				throw new InvalidInput("Invalid amount. Amount exceeds 99999999.");
 			else if (num < 0)
 				throw new InvalidInput("Invalid amount.");
 			

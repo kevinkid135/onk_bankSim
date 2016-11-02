@@ -307,6 +307,9 @@ public class SimBank {
 				out.println("Logged in as agent.");
 				break;
 			}
+			else {
+				out.println("Invalid mode.");
+			}
 		}
 
 		// read in valid accounts file after session type is accepted (loop
@@ -429,7 +432,7 @@ public class SimBank {
 					System.out.println("Account " + acc + " deleted.");
 					tranSummary.add(toTransMsg("DL", acc, "", 0, name));
 				} else {
-					System.out.println("Account already exists.");
+					System.out.println("Invalid account name.");
 				}
 			} else
 				System.out.println("Invalid account number.");
@@ -544,7 +547,7 @@ public class SimBank {
 			acc1.withdraw(amountInt);
 			acc2.deposit(amountInt);
 
-			System.out.println("Transferred " + amountInt + " from " + accNum1 + " to " + accNum2);
+			System.out.println("Transferred " + amountStr + " from " + accNum1 + " to " + accNum2);
 
 			// create transaction message and add it to tranSummary array
 			tranSummary.add(toTransMsg("TR", accNum2, accNum1, amountInt, ""));
