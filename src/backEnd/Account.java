@@ -1,5 +1,11 @@
 package backEnd;
 
+/**
+ * Account class. Holds the account number, balance, and name of the account. 
+ * 
+ * @author onk_Team
+ *
+ */
 public class Account {
 
 	private int number;
