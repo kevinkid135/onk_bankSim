@@ -4,7 +4,18 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Applies transactions to master account list
+ * Reads the merged transaction summary file and old master accounts file, and
+ * apply the transactions to the appropriate accounts. Transactions are applied
+ * if the values are valid and the constraints are met. If there are invalid
+ * values or the transaction fails to meet the constraints, the transaction
+ * fails and the program produces an error message before terminating. If all
+ * transactions are successfully processed, a new master accounts file and valid
+ * accounts file are output.
+ * 
+ * transSumFilename and masterAccListFilename are the name of the transaction
+ * summary file and master account list file respectively. localTranSum is the
+ * list of all the transactions message to be processes. localMasterAccList is
+ * the list of all the accounts currently in use.
  * 
  * @author onk_Team
  *
@@ -16,15 +27,20 @@ public class BackEnd {
 	private static ArrayList<Account> localMasterAccList = new ArrayList<Account>();
 
 	/**
-	 * Reads through transaction summary file and applies transaction to master
-	 * account list. Outputs new master account list and valid account list
+	 * Reads through transaction summary file and applies transaction to the
+	 * appropriate accounts in the master account list. Outputs the new master
+	 * account list and valid account list
 	 * 
 	 * @param args
+	 *            the filenames for the merged transaction summary file and
+	 *            master account list file respectively.
 	 */
 	public static void main(String[] args) {
 		transSumFilename = args[0];
 		masterAccListFilename = args[1];
 
+		// reads and saves the transaction summary file and master account list
+		// into an array list
 		try {
 			tranSumToArrayList(transSumFilename);
 			masterAccListToArrayList(masterAccListFilename);
@@ -32,7 +48,110 @@ public class BackEnd {
 			crash("Error creating arraylist from files.");
 		}
 
-		// loop through tranSum array
+		// apply transactions to the appropriate accounts
+		doTransaction();
+
+		// create new master account file and valid account file
+		try {
+			createMasterAccList();
+			createNewValidAccList();
+		} catch (Exception e) {
+			crash("Error writing to file.");
+		}
+	}
+
+	/**
+	 * Reads transaction summary file and converts it into an array list for
+	 * easy readability of lines of text
+	 * 
+	 * @param filename
+	 *            the name of the merged transaction summary file
+	 * @throws UnsupportedEncodingException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private static void tranSumToArrayList(String filename)
+			throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "Cp1252"));
+		String line;
+		while ((line = br.readLine()) != null) {
+			localTranSum.add(line);
+		}
+		br.close();
+	}
+
+	/**
+	 * Reads master account list file and converts it into an array list of
+	 * account objects for easy manipulation of attributes. Attributes for each
+	 * account is set according to the information in the master account list
+	 * file.
+	 * 
+	 * @param filename
+	 *            the name of the master account list file
+	 * @throws UnsupportedEncodingException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private static void masterAccListToArrayList(String filename)
+			throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "Cp1252"));
+		String line;
+		while ((line = br.readLine()) != null) {
+			String[] info = line.split(" ");
+			// create account object
+			Account a = new Account(Integer.parseInt(info[0]), Integer.parseInt(info[1]), info[2]);
+			localMasterAccList.add(a);
+		}
+		br.close();
+	}
+
+	/**
+	 * Creates the new master account list file from accounts and its attributes
+	 * in the localMasterAccList.
+	 * 
+	 * @param None
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException
+	 */
+	private static void createMasterAccList() throws FileNotFoundException, UnsupportedEncodingException {
+		// create/overwrite file
+		PrintWriter w = new PrintWriter(masterAccListFilename, "UTF-8");
+		for (Account a : localMasterAccList) {
+			String s = Integer.toString(a.getAccNum()) + " " + Integer.toString(a.getBalance()) + " " + a.getName();
+			w.println(s);
+		}
+		w.close();
+	}
+
+	/**
+	 * Creates the new valid account list file from the accounts in the
+	 * localMasterAccList.
+	 * 
+	 * @param None
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException
+	 */
+	private static void createNewValidAccList() throws FileNotFoundException, UnsupportedEncodingException {
+		// create/overwrite file
+		PrintWriter w = new PrintWriter("validAccList.txt", "UTF-8");
+		for (Account a : localMasterAccList) {
+			String s = Integer.toString(a.getAccNum());
+			w.println(s);
+		}
+		w.close();
+	}
+
+	/**
+	 * Apply the transactions listed in localTranSum to the accounts listed in
+	 * the localMasterAccList. Values are checked for validity before
+	 * transactions are processed, and attributes of accounts and accounts in
+	 * localMasterAccList are updated. Invalid transactions outputs a message
+	 * and terminates the program.
+	 * 
+	 * @param None
+	 */
+	private static void doTransaction() {
+		// loop through each element in tranSum array
 		for (String t : localTranSum) {
 			String[] tranMsg = t.split(" ");
 			// tranMsg[0] is transaction code
@@ -42,7 +161,6 @@ public class BackEnd {
 			// tranMsg[4] is accName
 
 			switch (tranMsg[0]) {
-			// if transaction code is deposit
 			case "DE": // deposit
 				deposit(toAccNum, amount);
 				break;
@@ -66,101 +184,18 @@ public class BackEnd {
 				System.exit(1);
 			}
 		}
-
-		// create new master account file using localMasterAccList
-		try {
-			createMasterAccList();
-			createNewValidAccList();
-		} catch (Exception e) {
-			crash("Error writing to file.");
-		}
-	}
-
-	/**
-	 * @throws FileNotFoundException
-	 * @throws UnsupportedEncodingException
-	 */
-	private static void createNewValidAccList() throws FileNotFoundException,
-			UnsupportedEncodingException {
-		// create/overwrite file
-		PrintWriter w = new PrintWriter("validAccList.txt", "UTF-8");
-		for (Account a : localMasterAccList) {
-			String s = Integer.toString(a.getAccNum());
-			w.println(s);
-		}
-		w.close();
-	}
-
-	/**
-	 * @throws FileNotFoundException
-	 * @throws UnsupportedEncodingException
-	 */
-	private static void createMasterAccList() throws FileNotFoundException,
-			UnsupportedEncodingException {
-		// create/overwrite file
-		PrintWriter w = new PrintWriter(masterAccListFilename, "UTF-8");
-		for (Account a : localMasterAccList) {
-			String s = Integer.toString(a.getAccNum()) + " "
-					+ Integer.toString(a.getBalance()) + " " + a.getName();
-			w.println(s);
-		}
-		w.close();
-	}
-
-	/**
-	 * Reads master account list and converts it into an arraylist of account
-	 * objects for easy manipulation of attributes
-	 * 
-	 * @param filename
-	 * @throws UnsupportedEncodingException
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private static void masterAccListToArrayList(String filename)
-			throws UnsupportedEncodingException, FileNotFoundException,
-			IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(
-				new FileInputStream(filename), "Cp1252"));
-		String line;
-		while ((line = br.readLine()) != null) {
-			String[] info = line.split(" ");
-			// create account object
-			Account a = new Account(Integer.parseInt(info[0]),
-					Integer.parseInt(info[1]), info[2]);
-			localMasterAccList.add(a);
-		}
-		br.close();
-	}
-
-	/**
-	 * Reads transaction summary and converts it into an arryalist for easy
-	 * readability of lines of text
-	 * 
-	 * @param filename
-	 * @throws UnsupportedEncodingException
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private static void tranSumToArrayList(String filename)
-			throws UnsupportedEncodingException, FileNotFoundException,
-			IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(
-				new FileInputStream(filename), "Cp1252"));
-		String line;
-		while ((line = br.readLine()) != null) {
-			localTranSum.add(line);
-		}
-		br.close();
 	}
 
 	/**
 	 * Creates an account if it does not already exist in the local master
-	 * account list
+	 * account list.
 	 * 
 	 * @param accNum
+	 *            the account number of the new account
 	 * @param accName
+	 *            the account name of the new account
 	 */
-	public static void create(int accNum, String accName) {
+	private static void create(int accNum, String accName) {
 		// account exists
 		if (findAccount(accNum) == null) {
 			localMasterAccList.add(new Account(accNum, accName));
@@ -170,12 +205,14 @@ public class BackEnd {
 	}
 
 	/**
-	 * Delete account if account exists, balance is 0, and account name matches
+	 * Delete account if account exists, balance is 0, and account name matches.
 	 * 
 	 * @param accNum
+	 *            the account number to delete
 	 * @param accName
+	 *            the account name to delete
 	 */
-	public static void delete(int accNum, String accName) {
+	private static void delete(int accNum, String accName) {
 		Account a = findAccount(accNum);
 		// account does not exist
 		if (a != null) {
@@ -190,12 +227,16 @@ public class BackEnd {
 	}
 
 	/**
-	 * Withdraws an amount from the account and updates balance
+	 * Withdraws an amount from the account if withdrawn amount does not exceed
+	 * the current balance. The balance is updated according to the withdrawn
+	 * amount.
 	 * 
 	 * @param accNum
+	 *            the account number of the account to withdraw from
 	 * @param amount
+	 *            the amount to withdraw from the account
 	 */
-	public static void withdraw(int accNum, int amount) {
+	private static void withdraw(int accNum, int amount) {
 		Account a = findAccount(accNum);
 		// account exists
 		if (a != null) {
@@ -211,12 +252,16 @@ public class BackEnd {
 	}
 
 	/**
-	 * Deposit amount into account
+	 * Deposit amount into account if the deposit will not cause the balance to
+	 * exceed $999,999.99. The balance is updated according to the deposited
+	 * amount.
 	 * 
 	 * @param accNum
+	 *            the account number to deposit to
 	 * @param amount
+	 *            the amount to withdraw to the account
 	 */
-	public static void deposit(int accNum, int amount) {
+	private static void deposit(int accNum, int amount) {
 		Account a = findAccount(accNum);
 		if (a != null) {
 			int newBalance = a.getBalance() + amount;
@@ -231,25 +276,31 @@ public class BackEnd {
 	}
 
 	/**
-	 * Transfer a certain amount from one account to another
+	 * Transfer a certain amount from one account to another if the balance of
+	 * neither accounts will become negative or exceed $999,999.99. Since
+	 * transfer is the junction of deposit and withdraw, the transfer
+	 * transaction is processed by calling both methods.
 	 * 
 	 * @param toAccNum
+	 *            the account number to deposit to
 	 * @param fromAccNum
+	 *            the account number to withdraw from
 	 * @param amount
+	 *            the amount to transfer from one account to the other
 	 */
-	public static void transfer(int toAccNum, int fromAccNum, int amount) {
+	private static void transfer(int toAccNum, int fromAccNum, int amount) {
 		withdraw(fromAccNum, amount);
 		deposit(toAccNum, amount);
 	}
 
 	/**
-	 * Determine if the account exists and returns account if it exists, and
-	 * null otherwise
+	 * Finds and returns an account if the account exists, and null otherwise.
 	 * 
 	 * @param accNum
-	 * @return
+	 *            the account number of the account to find
+	 * @return the corresponding account if found, null otherwise
 	 */
-	public static Account findAccount(int accNum) {
+	private static Account findAccount(int accNum) {
 		for (Account a : localMasterAccList) {
 			if (accNum == a.getAccNum())
 				return a; // account exists
@@ -258,11 +309,11 @@ public class BackEnd {
 	}
 
 	/**
-	 * Prints error message into console and exits program
+	 * Prints error message into console and exits program.
 	 * 
 	 * @param msg
 	 */
-	public static void crash(String msg) {
+	private static void crash(String msg) {
 		System.out.println(msg);
 		System.exit(1);
 	}
