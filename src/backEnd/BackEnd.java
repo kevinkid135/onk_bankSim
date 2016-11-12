@@ -187,8 +187,10 @@ public class BackEnd {
 	}
 
 	/**
-	 * Creates an account if it does not already exist in the local master
-	 * account list.
+	 * Checks the local master account list to see if the account already
+	 * exists. If it does not already exist, it adds the account to the internal
+	 * copy of the master accounts list. If it does exist, log a fatal error and
+	 * stop the program.
 	 * 
 	 * @param accNum
 	 *            the account number of the new account
@@ -205,7 +207,11 @@ public class BackEnd {
 	}
 
 	/**
-	 * Delete account if account exists, balance is 0, and account name matches.
+	 * Checks the local master account list to see if the account exists. If the
+	 * account exists, it deletes the account if the account balance is 0 and if
+	 * the input name matches the account name. If the account doesn’t exist,
+	 * the account balance is not 0, or the account name does not match, log a
+	 * fatal error and stop the program.
 	 * 
 	 * @param accNum
 	 *            the account number to delete
@@ -227,9 +233,13 @@ public class BackEnd {
 	}
 
 	/**
-	 * Withdraws an amount from the account if withdrawn amount does not exceed
-	 * the current balance. The balance is updated according to the withdrawn
-	 * amount.
+	 * Accepts an account number and an amount to withdraw, and checks the local
+	 * master account list to see if the account exists. If the account exists,
+	 * it checks if the withdrawn amount does not exceed the current balance in
+	 * the account. If the account does not exist or the amount withdrawn
+	 * exceeds the current balance in the account, log a fatal error and stop
+	 * the program. A successful withdraw transaction will update the account
+	 * balance according to the withdrawn amount.
 	 * 
 	 * @param accNum
 	 *            the account number of the account to withdraw from
@@ -252,9 +262,12 @@ public class BackEnd {
 	}
 
 	/**
-	 * Deposit amount into account if the deposit will not cause the balance to
-	 * exceed $999,999.99. The balance is updated according to the deposited
-	 * amount.
+	 * Accepts an account number and an amount to deposit, and checks the local
+	 * master account list to see if the account exists. If the account exists,
+	 * it checks if the deposit amount does not exceed the $999,999.99. If the
+	 * account does not exist or the amount deposited exceeds $999,999.99, log a
+	 * fatal error and stop the program. A successful deposit transaction will
+	 * update the account balance according to the deposited amount.
 	 * 
 	 * @param accNum
 	 *            the account number to deposit to
@@ -276,10 +289,13 @@ public class BackEnd {
 	}
 
 	/**
-	 * Transfer a certain amount from one account to another if the balance of
-	 * neither accounts will become negative or exceed $999,999.99. Since
-	 * transfer is the junction of deposit and withdraw, the transfer
-	 * transaction is processed by calling both methods.
+	 * Checks the local master account list to see if both accounts exists. If
+	 * both accounts exists, transfer the amount from one account to another if
+	 * the balance of neither accounts will become negative or exceed
+	 * $999,999.99. Since transfer is the junction of deposit and withdraw, the
+	 * transfer transaction is processed by calling both method. A successful
+	 * transfer transaction will update the account balances of both accounts
+	 * according to the transferred amount.
 	 * 
 	 * @param toAccNum
 	 *            the account number to deposit to
@@ -309,7 +325,7 @@ public class BackEnd {
 	}
 
 	/**
-	 * Prints error message into console and exits program.
+	 * Prints an error message to console and exits the program.
 	 * 
 	 * @param msg
 	 */
