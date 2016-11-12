@@ -73,9 +73,9 @@ public class BackEnd {
 	private static void tranSumToArrayList(String filename)
 			throws UnsupportedEncodingException, FileNotFoundException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "Cp1252"));
-		String line;
-		while ((line = br.readLine()) != null) {
-			localTranSum.add(line);
+		String tranMessage;
+		while ((tranMessage = br.readLine()) != null) {
+			localTranSum.add(tranMessage);
 		}
 		br.close();
 	}
@@ -95,9 +95,9 @@ public class BackEnd {
 	private static void masterAccListToArrayList(String filename)
 			throws UnsupportedEncodingException, FileNotFoundException, IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "Cp1252"));
-		String line;
-		while ((line = br.readLine()) != null) {
-			String[] info = line.split(" ");
+		String accountDetails;
+		while ((accountDetails = br.readLine()) != null) {
+			String[] info = accountDetails.split(" ");
 			// create account object
 			Account a = new Account(Integer.parseInt(info[0]), Integer.parseInt(info[1]), info[2]);
 			localMasterAccList.add(a);
@@ -117,8 +117,8 @@ public class BackEnd {
 		// create/overwrite file
 		PrintWriter w = new PrintWriter(masterAccListFilename, "UTF-8");
 		for (Account a : localMasterAccList) {
-			String s = Integer.toString(a.getAccNum()) + " " + Integer.toString(a.getBalance()) + " " + a.getName();
-			w.println(s);
+			String accountDetails = Integer.toString(a.getAccNum()) + " " + Integer.toString(a.getBalance()) + " " + a.getName();
+			w.println(accountDetails);
 		}
 		w.close();
 	}
@@ -135,8 +135,8 @@ public class BackEnd {
 		// create/overwrite file
 		PrintWriter w = new PrintWriter("validAccList.txt", "UTF-8");
 		for (Account a : localMasterAccList) {
-			String s = Integer.toString(a.getAccNum());
-			w.println(s);
+			String accountNumber = Integer.toString(a.getAccNum());
+			w.println(accountNumber);
 		}
 		w.close();
 	}
