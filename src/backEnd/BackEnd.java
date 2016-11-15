@@ -12,10 +12,11 @@ import java.util.ArrayList;
  * transactions are successfully processed, a new master accounts file and valid
  * accounts file are output.
  * 
- * transSumFilename and masterAccListFilename are the name of the transaction
- * summary file and master account list file respectively. localTranSum is the
- * list of all the transactions message to be processes. localMasterAccList is
- * the list of all the accounts currently in use.
+ * transSumFilename, masterAccListFilename and validAccListFilename are the name
+ * of the transaction summary file, master account list file, and valid account
+ * list file respectively. localTranSum is the list of all the transactions
+ * message to be processes. localMasterAccList is the list of all the accounts
+ * currently in use.
  * 
  * @author onk_Team
  *
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 public class BackEnd {
 	private static String transSumFilename;
 	private static String masterAccListFilename;
+	private static String validAccListFilename;
 	private static ArrayList<String> localTranSum = new ArrayList<String>();
 	private static ArrayList<Account> localMasterAccList = new ArrayList<Account>();
 
@@ -32,12 +34,13 @@ public class BackEnd {
 	 * account list and valid account list
 	 * 
 	 * @param args
-	 *            the filenames for the merged transaction summary file and
-	 *            master account list file respectively.
+	 *            the filenames for the merged transaction summary file, master
+	 *            account list file, and valid account list file respectively.
 	 */
 	public static void main(String[] args) {
 		transSumFilename = args[0];
 		masterAccListFilename = args[1];
+		validAccListFilename = args[2];
 
 		// reads and saves the transaction summary file and master account list
 		// into an array list
@@ -49,12 +52,12 @@ public class BackEnd {
 		}
 
 		// apply transactions to the appropriate accounts
-		doTransaction();
+		executeAppropriateTransaction();
 
 		// create new master account file and valid account file
 		try {
-			createMasterAccList();
-			createNewValidAccList();
+			createMasterAccList(masterAccListFilename);
+			createNewValidAccList(validAccListFilename);
 		} catch (Exception e) {
 			crash("Error writing to file.");
 		}
@@ -71,8 +74,10 @@ public class BackEnd {
 	 * @throws IOException
 	 */
 	private static void tranSumToArrayList(String filename)
-			throws UnsupportedEncodingException, FileNotFoundException, IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "Cp1252"));
+			throws UnsupportedEncodingException, FileNotFoundException,
+			IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(filename), "UTF-8"));
 		String tranMessage;
 		while ((tranMessage = br.readLine()) != null) {
 			localTranSum.add(tranMessage);
@@ -93,47 +98,59 @@ public class BackEnd {
 	 * @throws IOException
 	 */
 	private static void masterAccListToArrayList(String filename)
-			throws UnsupportedEncodingException, FileNotFoundException, IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "Cp1252"));
+			throws UnsupportedEncodingException, FileNotFoundException,
+			IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				new FileInputStream(filename), "UTF-8"));
 		String accountDetails;
 		while ((accountDetails = br.readLine()) != null) {
 			String[] info = accountDetails.split(" ");
 			// create account object
-			Account a = new Account(Integer.parseInt(info[0]), Integer.parseInt(info[1]), info[2]);
+			Account a = new Account(Integer.parseInt(info[0]),
+					Integer.parseInt(info[1]), info[2]);
 			localMasterAccList.add(a);
 		}
 		br.close();
 	}
 
 	/**
-	 * Creates the new master account list file from accounts and its attributes
+	 * Creates the new master account list file from Accounts (and its attributes)
 	 * in the localMasterAccList.
 	 * 
-	 * @param None
+	 * @param newMasterAccListFilename2
+	 * 
+	 * @param filename
+	 *            the name of the master account list file
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException
 	 */
-	private static void createMasterAccList() throws FileNotFoundException, UnsupportedEncodingException {
+	private static void createMasterAccList(String filename)
+			throws FileNotFoundException, UnsupportedEncodingException {
 		// create/overwrite file
-		PrintWriter w = new PrintWriter(masterAccListFilename, "UTF-8");
+		PrintWriter w = new PrintWriter(filename, "UTF-8");
 		for (Account a : localMasterAccList) {
-			String accountDetails = Integer.toString(a.getAccNum()) + " " + Integer.toString(a.getBalance()) + " " + a.getName();
+			String accountDetails = Integer.toString(a.getAccNum()) + " "
+					+ Integer.toString(a.getBalance()) + " " + a.getName();
 			w.println(accountDetails);
 		}
 		w.close();
 	}
 
 	/**
-	 * Creates the new valid account list file from the accounts in the
+	 * Creates the new valid account list file from the Accounts in the
 	 * localMasterAccList.
 	 * 
-	 * @param None
+	 * @param newValidAccListFilename2
+	 * 
+	 * @param filename
+	 *            the name of the new valid accounts list file
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException
 	 */
-	private static void createNewValidAccList() throws FileNotFoundException, UnsupportedEncodingException {
+	private static void createNewValidAccList(String filename)
+			throws FileNotFoundException, UnsupportedEncodingException {
 		// create/overwrite file
-		PrintWriter w = new PrintWriter("validAccList.txt", "UTF-8");
+		PrintWriter w = new PrintWriter(filename, "UTF-8");
 		for (Account a : localMasterAccList) {
 			String accountNumber = Integer.toString(a.getAccNum());
 			w.println(accountNumber);
@@ -150,7 +167,7 @@ public class BackEnd {
 	 * 
 	 * @param None
 	 */
-	private static void doTransaction() {
+	private static void executeAppropriateTransaction() {
 		// loop through each element in tranSum array
 		for (String t : localTranSum) {
 			String[] tranMsg = t.split(" ");
