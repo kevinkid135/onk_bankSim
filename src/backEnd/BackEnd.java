@@ -155,6 +155,7 @@ public class BackEnd {
 			String accountNumber = Integer.toString(a.getAccNum());
 			w.println(accountNumber);
 		}
+		w.println("00000000");
 		w.close();
 	}
 
