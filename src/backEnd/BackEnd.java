@@ -129,8 +129,16 @@ public class BackEnd {
 	private static void createMasterAccList(String filename)
 			throws FileNotFoundException, UnsupportedEncodingException {
 		// sort accounts in ascending order
+		/* This code can only work past Java 8
 		Collections.sort(localMasterAccList,
 				(acc1, acc2) -> acc1.getAccNum() - acc2.getAccNum());
+		*/
+		Collections.sort(localMasterAccList, new Comparator<Account>(){
+			@Override
+			public int compare(Account acc1, Account acc2) {
+				return acc1.getAccNum() - acc2.getAccNum();
+			}
+		});
 		// create/overwrite file
 		PrintWriter w = new PrintWriter(filename, "UTF-8");
 		for (Account a : localMasterAccList) {
