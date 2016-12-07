@@ -222,8 +222,7 @@ public class BackEnd {
 				// ignores the ES line
 				break;
 			default:
-				System.out.println("Transaction summary code is incorrect.");
-				System.exit(1);
+				crash("Transaction summary code is incorrect.");
 			}
 		}
 	}
@@ -245,6 +244,7 @@ public class BackEnd {
 			localMasterAccList.add(new Account(accNum, accName));
 		} else {
 			// ignore transaction
+			System.out.println("Transaction ignored. Account already exists.");
 		}
 	}
 
@@ -268,9 +268,11 @@ public class BackEnd {
 				localMasterAccList.remove(a);
 			} else {
 				// ignore transaction
+				System.out.println("Transaction ignored. Delete conditions not met");
 			}
 		} else {
 			// ignore transaction
+			System.out.println("Transaction ignored. Account does not exist.");
 		}
 	}
 
@@ -297,9 +299,11 @@ public class BackEnd {
 				a.setBalance(newBalance);
 			} else {
 				// ignore transaction
+				System.out.println("Transaction ignored. " + accNum + " would have a negative balance.");
 			}
 		} else {
 			//ignore transaction
+			System.out.println("Transaction ignored. Account does not exist.");
 		}
 	}
 
@@ -324,9 +328,11 @@ public class BackEnd {
 				a.setBalance(newBalance);
 			} else {
 			// ignore transaction
+				System.out.println("Transaction ignored. " + accNum + " would exceed max amount.");
 			}
 		} else {
 			// ignore transaction
+			System.out.println("Transaction ignored. Account does not exist.");
 		}
 	}
 
@@ -351,9 +357,11 @@ public class BackEnd {
 		Account fromAcc = findAccount(fromAccNum);
 		if (fromAcc == null){
 			//ignore transaction
+			System.out.println("Transaction ignored. Account does not exist.");
 			return;
 		} else if (fromAcc.getBalance() - amount < 0){
 			// ignore transaction
+			System.out.println("Transaction ignored. " + fromAccNum + " would have a negative balance.");
 			return;
 		}
 
@@ -361,9 +369,11 @@ public class BackEnd {
 		Account toAcc = findAccount(toAccNum);
 		if (toAcc == null) {
 			// ignore transaction
+			System.out.println("Transaction ignored. Account does not exist.");
 			return;
 		} else if (toAcc.getBalance() + amount > 99999999) {
 			// ignore transaction
+			System.out.println("Transaction ignored. " + toAccNum + " would exceed max amount.");
 			return;
 		}
 		// deposit should not crash at this point
