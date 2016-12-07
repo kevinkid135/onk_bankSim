@@ -2,6 +2,8 @@ package backEnd;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Reads the merged transaction summary file and old master accounts file, and
@@ -114,8 +116,8 @@ public class BackEnd {
 	}
 
 	/**
-	 * Creates the new master account list file from Accounts (and its attributes)
-	 * in the localMasterAccList.
+	 * Creates the new master account list file from Accounts (and its
+	 * attributes) in the localMasterAccList.
 	 *
 	 * @param filename
 	 *
@@ -126,13 +128,16 @@ public class BackEnd {
 	 */
 	private static void createMasterAccList(String filename)
 			throws FileNotFoundException, UnsupportedEncodingException {
+		// sort accounts in ascending order
+		Collections.sort(localMasterAccList,
+				(acc1, acc2) -> acc1.getAccNum() - acc2.getAccNum());
 		// create/overwrite file
 		PrintWriter w = new PrintWriter(filename, "UTF-8");
 		for (Account a : localMasterAccList) {
 			// pad the amount to 3 digits (if less than 3 digits)
 			// and convert amount to a string
 			int amount = a.getBalance();
-			String amountString="";
+			String amountString = "";
 
 			if (amount == 0)
 				amountString = "000";
@@ -335,13 +340,13 @@ public class BackEnd {
 	 */
 	private static void transfer(int toAccNum, int fromAccNum, int amount) {
 		// check that deposit doesn't fail
-        Account a = findAccount(toAccNum);
-        if (a == null) {
-            crash("Account does not exist.");
-        } else if (a.getBalance() + amount > 99999999) {
-            crash("Deposit amount exceeds $999,999.99");
-        }
-        // deposit should not crash at this point
+		Account a = findAccount(toAccNum);
+		if (a == null) {
+			crash("Account does not exist.");
+		} else if (a.getBalance() + amount > 99999999) {
+			crash("Deposit amount exceeds $999,999.99");
+		}
+		// deposit should not crash at this point
 		withdraw(fromAccNum, amount);
 		deposit(toAccNum, amount);
 	}
