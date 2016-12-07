@@ -11,13 +11,13 @@ import java.util.ArrayList;
  * fails and the program produces an error message before terminating. If all
  * transactions are successfully processed, a new master accounts file and valid
  * accounts file are output.
- * 
+ *
  * transSumFilename, masterAccListFilename and validAccListFilename are the name
  * of the transaction summary file, master account list file, and valid account
  * list file respectively. localTranSum is the list of all the transactions
  * message to be processes. localMasterAccList is the list of all the accounts
  * currently in use.
- * 
+ *
  * @author onk_Team
  *
  */
@@ -32,7 +32,7 @@ public class BackEnd {
 	 * Reads through transaction summary file and applies transaction to the
 	 * appropriate accounts in the master account list. Outputs the new master
 	 * account list and valid account list
-	 * 
+	 *
 	 * @param args
 	 *            the filenames for the merged transaction summary file, master
 	 *            account list file, and valid account list file respectively.
@@ -66,7 +66,7 @@ public class BackEnd {
 	/**
 	 * Reads transaction summary file and converts it into an array list for
 	 * easy readability of lines of text
-	 * 
+	 *
 	 * @param filename
 	 *            the name of the merged transaction summary file
 	 * @throws UnsupportedEncodingException
@@ -90,7 +90,7 @@ public class BackEnd {
 	 * account objects for easy manipulation of attributes. Attributes for each
 	 * account is set according to the information in the master account list
 	 * file.
-	 * 
+	 *
 	 * @param filename
 	 *            the name of the master account list file
 	 * @throws UnsupportedEncodingException
@@ -116,9 +116,9 @@ public class BackEnd {
 	/**
 	 * Creates the new master account list file from Accounts (and its attributes)
 	 * in the localMasterAccList.
-	 * 
-	 * @param newMasterAccListFilename2
-	 * 
+	 *
+	 * @param filename
+	 *
 	 * @param filename
 	 *            the name of the master account list file
 	 * @throws FileNotFoundException
@@ -129,8 +129,21 @@ public class BackEnd {
 		// create/overwrite file
 		PrintWriter w = new PrintWriter(filename, "UTF-8");
 		for (Account a : localMasterAccList) {
+			// pad the amount to 3 digits (if less than 3 digits)
+			// and convert amount to a string
+			int amount = a.getBalance();
+			String amountString="";
+
+			if (amount == 0)
+				amountString = "000";
+			else if (amount < 10)
+				amountString = "00" + String.valueOf(amount);
+			else if (amount < 100)
+				amountString = "0" + String.valueOf(amount);
+			else
+				amountString = String.valueOf(amount);
 			String accountDetails = Integer.toString(a.getAccNum()) + " "
-					+ Integer.toString(a.getBalance()) + " " + a.getName();
+					+ amountString + " " + a.getName();
 			w.println(accountDetails);
 		}
 		w.close();
@@ -139,9 +152,9 @@ public class BackEnd {
 	/**
 	 * Creates the new valid account list file from the Accounts in the
 	 * localMasterAccList.
-	 * 
-	 * @param newValidAccListFilename2
-	 * 
+	 *
+	 * @param filename
+	 *
 	 * @param filename
 	 *            the name of the new valid accounts list file
 	 * @throws FileNotFoundException
@@ -165,8 +178,6 @@ public class BackEnd {
 	 * transactions are processed, and attributes of accounts and accounts in
 	 * localMasterAccList are updated. Invalid transactions outputs a message
 	 * and terminates the program.
-	 * 
-	 * @param None
 	 */
 	private static void executeAppropriateTransaction() {
 		// loop through each element in tranSum array
@@ -209,7 +220,7 @@ public class BackEnd {
 	 * exists. If it does not already exist, it adds the account to the internal
 	 * copy of the master accounts list. If it does exist, log a fatal error and
 	 * stop the program.
-	 * 
+	 *
 	 * @param accNum
 	 *            the account number of the new account
 	 * @param accName
@@ -230,7 +241,7 @@ public class BackEnd {
 	 * the input name matches the account name. If the account doesn’t exist,
 	 * the account balance is not 0, or the account name does not match, log a
 	 * fatal error and stop the program.
-	 * 
+	 *
 	 * @param accNum
 	 *            the account number to delete
 	 * @param accName
@@ -258,7 +269,7 @@ public class BackEnd {
 	 * exceeds the current balance in the account, log a fatal error and stop
 	 * the program. A successful withdraw transaction will update the account
 	 * balance according to the withdrawn amount.
-	 * 
+	 *
 	 * @param accNum
 	 *            the account number of the account to withdraw from
 	 * @param amount
@@ -286,7 +297,7 @@ public class BackEnd {
 	 * account does not exist or the amount deposited exceeds $999,999.99, log a
 	 * fatal error and stop the program. A successful deposit transaction will
 	 * update the account balance according to the deposited amount.
-	 * 
+	 *
 	 * @param accNum
 	 *            the account number to deposit to
 	 * @param amount
@@ -296,7 +307,7 @@ public class BackEnd {
 		Account a = findAccount(accNum);
 		if (a != null) {
 			int newBalance = a.getBalance() + amount;
-			if (newBalance < 99999999) {
+			if (newBalance <= 99999999) {
 				a.setBalance(newBalance);
 			} else {
 				crash("Deposit amount exceeds $999,999.99");
@@ -314,7 +325,7 @@ public class BackEnd {
 	 * transfer transaction is processed by calling both method. A successful
 	 * transfer transaction will update the account balances of both accounts
 	 * according to the transferred amount.
-	 * 
+	 *
 	 * @param toAccNum
 	 *            the account number to deposit to
 	 * @param fromAccNum
@@ -323,13 +334,21 @@ public class BackEnd {
 	 *            the amount to transfer from one account to the other
 	 */
 	private static void transfer(int toAccNum, int fromAccNum, int amount) {
+		// check that deposit doesn't fail
+        Account a = findAccount(toAccNum);
+        if (a == null) {
+            crash("Account does not exist.");
+        } else if (a.getBalance() + amount > 99999999) {
+            crash("Deposit amount exceeds $999,999.99");
+        }
+        // deposit should not crash at this point
 		withdraw(fromAccNum, amount);
 		deposit(toAccNum, amount);
 	}
 
 	/**
 	 * Finds and returns an account if the account exists, and null otherwise.
-	 * 
+	 *
 	 * @param accNum
 	 *            the account number of the account to find
 	 * @return the corresponding account if found, null otherwise
@@ -344,7 +363,7 @@ public class BackEnd {
 
 	/**
 	 * Prints an error message to console and exits the program.
-	 * 
+	 *
 	 * @param msg
 	 */
 	private static void crash(String msg) {
