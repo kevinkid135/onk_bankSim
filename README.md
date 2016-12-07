@@ -15,13 +15,13 @@ For more details, see http://research.cs.queensu.ca/home/cordy/cisc327/index.htm
 
 # Setup
 
-The following was successful using java version 1.7.0_111 on Bash. 
+The following was tested using java version 1.7.0_111 on Bash. 
 
 To create a .jar executable (and run it):
 
 ## Front End
 
-Before we begin, make sure that the frontEnd/ directory are in the current directory (`ls` returns the 'frontEnd' folder).
+Before we begin, make sure that the /frontEnd directory are in the current directory (`ls` returns the 'frontEnd' folder).
 
 1. Create the **.class files** from the .java files (.java -> .class)
   ```bash
@@ -46,7 +46,7 @@ Before we begin, make sure that the frontEnd/ directory are in the current direc
 
 ## Back Office
 
-Run the same commands as above, but for the backEnd/ files.
+Run the same commands as above, but for the /backEnd files.
 
 1. Create the **.class files**
   ```bash
