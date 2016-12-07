@@ -244,7 +244,7 @@ public class BackEnd {
 		if (findAccount(accNum) == null) {
 			localMasterAccList.add(new Account(accNum, accName));
 		} else {
-			crash("Account already exists.");
+			// ignore transaction
 		}
 	}
 
@@ -267,10 +267,10 @@ public class BackEnd {
 			if (a.getBalance() == 0 && a.getName().equals(accName)) {
 				localMasterAccList.remove(a);
 			} else {
-				crash("Delete conditions not met.");
+				// ignore transaction
 			}
 		} else {
-			crash("Account does not exist.");
+			// ignore transaction
 		}
 	}
 
@@ -296,10 +296,10 @@ public class BackEnd {
 			if (newBalance >= 0) {
 				a.setBalance(newBalance);
 			} else {
-				crash("Withdrawing amount exceeds current balance.");
+				// ignore transaction
 			}
 		} else {
-			crash("Account does not exist.");
+			//ignore transaction
 		}
 	}
 
@@ -323,10 +323,10 @@ public class BackEnd {
 			if (newBalance <= 99999999) {
 				a.setBalance(newBalance);
 			} else {
-				crash("Deposit amount exceeds $999,999.99");
+			// ignore transaction
 			}
 		} else {
-			crash("Account does not exist.");
+			// ignore transaction
 		}
 	}
 
@@ -347,12 +347,24 @@ public class BackEnd {
 	 *            the amount to transfer from one account to the other
 	 */
 	private static void transfer(int toAccNum, int fromAccNum, int amount) {
+		// check that withdraw doesn't fail
+		Account fromAcc = findAccount(fromAccNum);
+		if (fromAcc == null){
+			//ignore transaction
+			return;
+		} else if (fromAcc.getBalance() - amount < 0){
+			// ignore transaction
+			return;
+		}
+
 		// check that deposit doesn't fail
-		Account a = findAccount(toAccNum);
-		if (a == null) {
-			crash("Account does not exist.");
-		} else if (a.getBalance() + amount > 99999999) {
-			crash("Deposit amount exceeds $999,999.99");
+		Account toAcc = findAccount(toAccNum);
+		if (toAcc == null) {
+			// ignore transaction
+			return;
+		} else if (toAcc.getBalance() + amount > 99999999) {
+			// ignore transaction
+			return;
 		}
 		// deposit should not crash at this point
 		withdraw(fromAccNum, amount);
