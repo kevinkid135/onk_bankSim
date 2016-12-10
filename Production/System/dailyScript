@@ -1,0 +1,172 @@
+#!/bin/bash
+
+# CISC 327, fall 2016
+# Assignment 6
+# For Prof James Cordy
+# Due 9 Dec 2016
+# Author: Team Onk (Kevin Chan, Niki Lin, Simon Zhang)
+
+# Daily script for SimBank
+# Please see folder_hierarchy.jpg for the expected folder hierarchy for which this script uses.
+
+# command line arguments:
+# $1 = week number 
+# $2 = day number (1 to 5)
+
+# ----- FRONT END --------------------------------------------------
+# - runs the Front End for any number of transaction session input files each with the day's valid accounts file
+# - Front End outputs console output files and transaction summary files
+# - concatenates/merges all transaction summary files into a merged transaction summary file for the whole day
+
+# FRONT END - FILE NAMES
+# INPUT
+# - WXDXSXin.txt - console input for individual transaction sessions
+# - WXDXaccounts.txt - current day's valid accounts list
+# OUTPUT
+# - WXDXSXout.txt - console output for individual transaction sessions
+# - WXDXSXtranSum.txt - individual transaction session's transaction summary file
+
+# - WXDXmerged.txt - all the transaction summary files for the current day's session merged into one file
+
+# where X is the appropriate week/day/session number
+
+# ----- BACK OFFICE --------------------------------------------------
+# - copies the current day master accounts file (old) into filename denotes the next day's master accounts list (new)
+# - master accounts list file is empty if this is the first day
+# - runs the Back Office using this merged transaction summary file and the copied/new master accounts file
+# - Back Office outputs new valid account list (for next day) and overwrites the copied/new master accounts file
+# - copies new valid accounts list file and new master accounts into the next day's directory
+
+# BACK OFFICE - FILE NAMES
+# INPUT
+# - WXDXmasterAccounts.txt - current day's master accounts file (old; copy of this is used in back office)
+# - WXDXmerged.txt - all the transaction summary files for the current day's session merged into one file
+
+# - WYDYmasterAccounts.txt - copy of current day's master accounts file
+# OUTPUT
+# - WYDYaccounts.txt - next day's valid accounts list
+# - WYDYmasterAccounts.txt - next day's master accounts file (new)
+# - WXDXconsoleOutput.txt - console output for back office
+
+# where X is the appropriate week/day number for the current day
+# and Y is the appropriate week/day number for the next day
+
+# ----- FRONT END --------------------------------------------------
+
+# if week number is not entered in parameter 1
+if [ -z ${1} ]
+then
+	echo "Please enter a week number in parameter 1."
+	exit 1
+fi
+
+# if day number is not entered in parameter 2
+if [ -z ${2} ]
+then
+	echo "Please enter a day number in parameter 2."
+	exit 1
+fi
+
+# ask for confirmation
+read -p "Are you sure you want to run the daily script for week "$1", day "$2"? [y/n]" -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+	exit 1
+fi
+
+echo "Executing the daily script for week "$1", day "$2"..."
+
+cd ../W$1/D$2/
+
+WDCode="W"$1"D"$2
+accounts=$WDCode"accounts.txt"
+
+# execute front end program for all sessions,
+# thus creating output and transaction summary files for each session
+for input in $(ls *"in.txt")
+do
+	WDSCode=${input%"in.txt"}
+
+	# filenames
+	frontEnd="../../System/SimBank-front.jar"
+	tranSum="$WDSCode""tranSum.txt"
+	#input=input
+	output="$WDSCode""out.txt"
+
+	echo "Executing "$frontEnd" for "$WDSCode"..."
+
+	java -jar $frontEnd $accounts $tranSum < $input &> $output
+done
+
+merged=$WDCode"merged.txt"
+
+echo -n > $merged
+
+# merged all transaction summary files into 'WXDXmerged.txt'
+for tranSum in $(ls *"tranSum.txt")
+do
+	echo "Merging '$tranSum' into '$merged'"
+	cat $tranSum >> $merged
+done
+
+# merged transaction summary file should end with two ES lines 
+# (one from last appended transaction summary file, one appended here)
+echo "ES 00000000 00000000 000 ***" >> $merged
+
+# ----- BACK OFFICE --------------------------------------------------
+# run the back office program for this day
+
+oldWeek=${1}
+oldDay=${2}
+
+# increment week and day numbers
+if (( $oldDay == 5 ))
+then
+	newWeek=$((oldWeek+1))
+	newDay=1
+else
+	newWeek=$oldWeek
+	newDay=$((oldDay+1))
+fi
+
+newWDCode="W"$newWeek"D"$newDay
+
+# filenames
+backOffice="../../System/SimBank-back.jar"
+oldMasterAcc="$WDCode""masterAccounts.txt"
+newMasterAcc="$newWDCode""masterAccounts.txt"
+#merged=merged
+oldAccounts=$accounts
+newAccounts="$newWDCode""accounts.txt"
+consoleOutput="$WDCode""backOutput.txt"
+
+# create new master accounts list file for next day (so the one for the previous day is not overwritten)
+cp $oldMasterAcc $newMasterAcc
+
+echo "Executing "$backOffice" for "$WDCode"..."
+java -jar $backOffice $merged $newMasterAcc $newAccounts &> $consoleOutput
+
+exitCode=${?}
+
+# if errors occurred, use the master accounts list and valid accounts list from previous day
+# note: error messages will be in the file $consoleOutput
+if (( $exitCode != 0 ))
+then 
+	cat $oldMasterAcc > $newMasterAcc
+	cat $oldAccounts > $newAccounts
+fi
+
+# move new files to new folder
+if (( $oldDay == 5 ))
+then
+	mkdir -p ../../"W""$newWeek"/"D""$newDay"/
+	mv $newMasterAcc ../../"W""$newWeek"/"D""$newDay"/$newMasterAcc
+	mv $newAccounts ../../"W""$newWeek"/"D""$newDay"/$newAccounts
+else
+	mkdir -p ../"D""$newDay"/
+	mv $newMasterAcc ../"D""$newDay"/$newMasterAcc
+	mv $newAccounts ../"D""$newDay"/$newAccounts
+fi
+
+exit 0

@@ -1,0 +1,13 @@
+login
+agent
+create
+12345678
+Name
+create
+11111111
+Name1
+create
+22222222
+Name2
+logout
+exit

@@ -15,11 +15,13 @@ For more details, see http://research.cs.queensu.ca/home/cordy/cisc327/index.htm
 
 # Setup
 
-The following was tested using java version 1.7.0_111 on Bash. 
+Create the .jar executable and move/copy it to the Production/System/ folder. Then, use bash to execute `./dailyScript` and/or `./weeklyScript`.
 
-To create a .jar executable (and run it):
+This was tested using java version 1.7.0_111 on Bash.
 
-## Front End
+## Creating (and running) a .jar executable
+
+### Front End
 
 Before we begin, make sure that the /frontEnd directory are in the current directory (`ls` returns the 'frontEnd' folder).
 
@@ -44,7 +46,7 @@ Before we begin, make sure that the /frontEnd directory are in the current direc
   where '*accountList.txt*' is the accounts list file,
   and '*tranSum.txt*' is the transaction summary file
 
-## Back Office
+### Back Office
 
 Run the same commands as above, but for the /backEnd files.
 

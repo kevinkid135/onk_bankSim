@@ -1,0 +1,16 @@
+login
+agent
+create
+66666666
+Name6
+create
+77777777
+Name7
+create
+88888888
+Name8
+create
+99999999
+Name9
+logout
+exit
