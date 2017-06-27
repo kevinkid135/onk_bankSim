@@ -31,13 +31,13 @@ Before we begin, make sure that the /frontEnd directory are in the current direc
   ```
   This will compile the .java files.
 
-1. Create the **.jar executable file** from the .class files (.class -> .jar)
+2. Create the **.jar executable file** from the .class files (.class -> .jar)
   ```bash
   jar cfe SimBank-front.jar frontEnd.Onk frontEnd/*.class
   ```
   This will create a file 'SimBank-front.jar' where 'frontEnd.Onk' is the main class using the .class files in the 'frontEnd'   directory.
 
-1. Execute the **.jar executable file**
+3. Execute the **.jar executable file**
 
   Make sure you are in a directory with the accounts list file and the transaction summary file.
   ```bash
@@ -55,12 +55,12 @@ Run the same commands as above, but for the /backEnd files.
   javac backEnd/*.java
   ```
   
-1. Create the **.jar executable** file
+2. Create the **.jar executable** file
   ```bash
   jar cfe SimBank-back.jar backEnd.BackEnd backEnd/*.class
   ```
   
-1. Execute the **.jar executable** file
+3. Execute the **.jar executable** file
 
   Make sure you are in a directory with the merged transaction summary file, the master accounts list file, and the valid accounts list file. Note that the changes to master accounts list will be written directly to file (file will be overwritten!).
   ```bash
